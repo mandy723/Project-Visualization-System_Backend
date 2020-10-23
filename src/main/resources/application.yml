@@ -1,0 +1,6 @@
+spring:
+  profiles: test
+server:
+  port: 8091
+  context-path: /rvs-api
+frontend: http://localhost:3000

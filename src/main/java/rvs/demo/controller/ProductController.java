@@ -1,13 +1,14 @@
-package controller;
+package rvs.demo.controller;
 
-import mockData.Product;
+import rvs.demo.config.YAMLConfig;
+import rvs.demo.mockData.Product;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CommitService;
 import org.eclipse.egit.github.core.service.RepositoryService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +21,9 @@ import java.util.List;
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class ProductController{
+
+    @Autowired
+    private YAMLConfig myConfig;
 
     @GetMapping("/products/{id}")
     public Product getProduct(@PathVariable("id") String id) throws IOException {
@@ -44,7 +48,7 @@ public class ProductController{
 //            System.out.println(repo.getName() + " Watchers: " + repo.getWatchers());
 //        }
 
-
+        System.out.println(myConfig.getFrontend());
 
 
         Product product = new Product();

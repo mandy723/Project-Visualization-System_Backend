@@ -1,4 +1,4 @@
-package mockData;
+package rvs.demo.mockData;
 
 public class Product {
     private String id;
