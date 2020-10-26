@@ -15,6 +15,8 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.xml.ws.Response;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -26,14 +28,18 @@ public class ProductController{
             restTemplate.setErrorHandler(new CustomErrorHandler());
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Authorization", "Bearer 32290bf842eef38efd61707705f5b01aa2f6e8bb");
-            headers.add("content-type", "application/json"); // just modified graphql into json
+            headers.add("Authorization", "Bearer fe634ce5380e7517f59ee0860316afa8a2271c93");
+//            headers.add("content-type", "application/json"); // just modified graphql into json
 
-        String query = "{query: {"+
-            "repository(owner: \"facebook\", name:\"react\") {"+
-                "description"+
-            "}"+
-        "}}";
+        Map<String, Object> params = new HashMap<>();
+        params.put("query", "{repository(owner: \"facebook\", name: \"react\") { description }}");
+
+
+//        String query = "{\"query\": \"{"+
+//            "repository(owner: \"facebook\", name:\"react\") {"+
+//                "description"+
+//            "}"+
+//        "}}";
 
 //            String query = "query: query{" +
 //                                "repository(owner: \"facebook\", name:\"react\") {" +
@@ -55,11 +61,11 @@ public class ProductController{
             String URL = "https://api.github.com/graphql";
 
 
-            ResponseEntity<String> response = restTemplate.postForEntity(URL, new HttpEntity<>(query, headers), String.class);
+            ResponseEntity<String> response = restTemplate.postForEntity(URL, new HttpEntity<>(params, headers), String.class);
             System.out.println("The response=================" + response);
 
         System.out.println(response.getBody());
-        return response.toString();
+        return response.getBody();
     }
 
 }
