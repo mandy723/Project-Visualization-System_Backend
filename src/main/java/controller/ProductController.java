@@ -28,12 +28,25 @@ public class ProductController{
             restTemplate.setErrorHandler(new CustomErrorHandler());
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Authorization", "Bearer fe634ce5380e7517f59ee0860316afa8a2271c93");
+            headers.add("Authorization", "Bearer 036075e2e957735ed448e88f3d700dbc50564fe6");
 //            headers.add("content-type", "application/json"); // just modified graphql into json
 
         Map<String, Object> params = new HashMap<>();
-        params.put("query", "{repository(owner: \"facebook\", name: \"react\") { description }}");
+//        params.put("query", "{repository(owner: \"facebook\", name: \"react\") { description }}");
 
+        params.put("query", "{repository(owner: \"facebook\", name:\"react\") {" +
+                                "defaultBranchRef {" +
+                                    "target {" +
+                                        "... on Commit {" +
+                                            "history (first:100) {" +
+                                                "nodes {" +
+                                                    "committedDate" +
+                                                "}" +
+                                            "}" +
+                                        "}" +
+                                    "}" +
+                                "}" +
+                            "}}");
 
 //        String query = "{\"query\": \"{"+
 //            "repository(owner: \"facebook\", name:\"react\") {"+
