@@ -1,7 +1,8 @@
-package rvs.demo.model;
+package rvs.demo.repository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import rvs.demo.model.Member;
 
 import java.util.List;
 

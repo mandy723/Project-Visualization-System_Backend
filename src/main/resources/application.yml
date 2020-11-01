@@ -3,9 +3,9 @@ server:
   context-path: /rvs-api
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/mydb?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false
-    username: dev01
-    password: dev01
+    url: jdbc:mysql://localhost:3306/rvs?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+    username: admin
+    password: admin
     driver-class-name: com.mysql.jdbc.Driver
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect

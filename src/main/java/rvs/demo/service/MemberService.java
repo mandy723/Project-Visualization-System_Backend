@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rvs.demo.model.Member;
 import rvs.demo.model.MemberBo;
-import rvs.demo.model.MemberDAO;
+import rvs.demo.repository.MemberDAO;
 
 @Service
 public class MemberService {
