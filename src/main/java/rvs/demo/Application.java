@@ -23,19 +23,6 @@ public class Application {
 
         ConfigurableApplicationContext context =
                 SpringApplication.run(Application.class, args); // 取得Spring Context
-
-        MemberService memberService = context.getBean(MemberService.class);
-
-        MemberBo bo1 = new MemberBo();
-        bo1.setId(10001L);
-        bo1.setAccount("bo1");
-        bo1.setPassword("bo1");
-        memberService.add(bo1);
-
-//        MemberBo bo2 = memberService.get(10001L);
-//        System.out.println(bo2);
-
-
     }
 
 }
