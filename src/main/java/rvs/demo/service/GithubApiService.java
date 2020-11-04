@@ -2,7 +2,6 @@ package rvs.demo.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -10,6 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class GithubApiService {
@@ -18,7 +18,13 @@ public class GithubApiService {
 
     private Map<String, Object> graphQl;
 
-    private String token = "adaeef7758abc5142759c11d037147ee595642f3"; //todo get token from database
+    private String token = "062fe366aed320c7b0b1bb5fbedb48bc14ffc821"; //todo get token from database
+
+    public GithubApiService(WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder.baseUrl("https://api.github.com/graphql")
+                .defaultHeader("Authorization", "Bearer " + token )
+                .build();
+    }
 
     private void setGraphQl(String owner, String name) {
         //todo get data since last commit date to now
@@ -39,35 +45,32 @@ public class GithubApiService {
         this.graphQl = graphQl;
     }
 
-
-    public GithubApiService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("https://api.github.com/graphql").build();
-    }
-
     public JsonNode getCommits(String owner, String name) throws IOException {
         this.setGraphQl(owner, name);
-
-        String responseJson = webClient.post()
+        //todo use thread get commits from Github
+        String responseJson = this.webClient.post()
                 .body(BodyInserters.fromObject(this.graphQl))
-                .header("Authorization", "Bearer " + token )
                 .exchange()
                 .block()
                 .bodyToMono(String.class)
                 .block();
+        System.out.println(responseJson);
+
+        System.out.println("responseJson ====");
+        System.out.println(responseJson);
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode responseObj = mapper.readTree(responseJson);
 
-        if(!responseObj.has("errors")) {
-            return mapper.readTree(responseJson)
-                    .get("data")
-                        .get("repository")
-                            .get("defaultBranchRef")
-                                .get("target")
-                                    .get("history")
-                                        .get("nodes");
-        }
-        return null;
+        Optional<JsonNode> committedDates = Optional.ofNullable(mapper.readTree(responseJson))
+                .map(resp -> resp.get("data"))
+                    .map(data -> data.get("repository"))
+                        .map(repo -> repo.get("defaultBranchRef"))
+                            .map(branch -> branch.get("target"))
+                                .map(tag -> tag.get("history"))
+                                    .map(hist -> hist.get("nodes"));
+
+        return committedDates.orElse(null);
     }
 
 

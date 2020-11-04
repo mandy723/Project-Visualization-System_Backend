@@ -1,12 +1,10 @@
 package rvs.demo.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rvs.demo.model.GitCommit;
 import rvs.demo.model.GitCommitBo;
 import rvs.demo.repository.GitCommitDAO;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,8 +12,11 @@ import java.util.List;
 @Service
 public class GitCommitService {
 
-    @Autowired
-    private GitCommitDAO gitCommitDAO;
+    private final GitCommitDAO gitCommitDAO;
+
+    GitCommitService(GitCommitDAO gitCommitDAO) {
+        this.gitCommitDAO = gitCommitDAO;
+    }
 
     public void add(GitCommitBo bo) {
         GitCommit entity = new GitCommit();
@@ -25,7 +26,7 @@ public class GitCommitService {
         gitCommitDAO.save(entity);
     }
 
-    public List<GitCommitBo> getAll(String owner, String name) {
+    public List<GitCommitBo> getAllCommits(String owner, String name) {
         List<GitCommit> entities = gitCommitDAO.findByOwnerAndName(owner, name);
         List<GitCommitBo> bos = new LinkedList<>();
 
@@ -43,7 +44,7 @@ public class GitCommitService {
 
     public GitCommitBo getCommit(String owner, String name, Date committedDate) {
         GitCommit entity = gitCommitDAO.findByOwnerAndNameAndCommittedDate(owner, name, committedDate);
-        return new GitCommitBo(entity.getOwner(), entity.getName(), entity.getCommittedDate());
+        return entity != null ? new GitCommitBo(entity.getOwner(), entity.getName(), entity.getCommittedDate()): null;
     }
 
 }

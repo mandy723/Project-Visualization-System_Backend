@@ -1,6 +1,5 @@
 package rvs.demo.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rvs.demo.model.Member;
 import rvs.demo.model.MemberBo;
@@ -9,8 +8,11 @@ import rvs.demo.repository.MemberDAO;
 @Service
 public class MemberService {
 
-    @Autowired
-    private MemberDAO memberDAO;
+    private final MemberDAO memberDAO;
+
+    MemberService(MemberDAO memberDAO) {
+        this.memberDAO = memberDAO;
+    }
 
     public void add(MemberBo bo) {
         Member entity = new Member();

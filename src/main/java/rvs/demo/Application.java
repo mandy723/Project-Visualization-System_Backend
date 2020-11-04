@@ -2,15 +2,12 @@ package rvs.demo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableMBeanExport;
 import org.springframework.jmx.support.RegistrationPolicy;
-import rvs.demo.model.MemberBo;
-import rvs.demo.service.MemberService;
 
 @EnableMBeanExport(registration= RegistrationPolicy.IGNORE_EXISTING)
 @SpringBootApplication
