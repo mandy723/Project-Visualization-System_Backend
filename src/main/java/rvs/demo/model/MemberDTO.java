@@ -1,6 +1,6 @@
 package rvs.demo.model;
 
-public class MemberBo {
+public class MemberDTO {
 
     private Long id;
     private String account;

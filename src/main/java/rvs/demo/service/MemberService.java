@@ -2,7 +2,7 @@ package rvs.demo.service;
 
 import org.springframework.stereotype.Service;
 import rvs.demo.model.Member;
-import rvs.demo.model.MemberBo;
+import rvs.demo.model.MemberDTO;
 import rvs.demo.repository.MemberDAO;
 
 @Service
@@ -14,16 +14,16 @@ public class MemberService {
         this.memberDAO = memberDAO;
     }
 
-    public void add(MemberBo bo) {
+    public void add(MemberDTO bo) {
         Member entity = new Member();
         entity.setAccount(bo.getAccount());
         entity.setPassword(bo.getPassword());
         memberDAO.save(entity);
     }
 
-    public MemberBo get(long id) {
+    public MemberDTO get(long id) {
         Member entity = memberDAO.findById(id);
-        MemberBo bo = new MemberBo();
+        MemberDTO bo = new MemberDTO();
         bo.setId(entity.getId());
         bo.setAccount(entity.getAccount());
         bo.setPassword(entity.getPassword());

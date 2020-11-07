@@ -18,7 +18,7 @@ public class GithubApiService {
 
     private Map<String, Object> graphQl;
 
-    private String token = "062fe366aed320c7b0b1bb5fbedb48bc14ffc821"; //todo get token from database
+    private String token = "7a932d35a4ab732ccebd624311b0daa70fcd49af"; //todo get token from database
 
     public GithubApiService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl("https://api.github.com/graphql")
@@ -35,7 +35,14 @@ public class GithubApiService {
                                         "... on Commit {" +
                                             "history (first:100) {" +
                                                 "nodes {" +
-                                                    "committedDate" +
+                                                    "committedDate\n" +
+                                                    "additions\n" +
+                                                    "deletions\n" +
+                                                    "changedFiles\n" +
+                                                    "author {" +
+                                                        "email\n" +
+                                                        "name\n" +
+                                                    "}" +
                                                 "}" +
                                             "}" +
                                         "}" +
@@ -60,18 +67,50 @@ public class GithubApiService {
         System.out.println(responseJson);
 
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode responseObj = mapper.readTree(responseJson);
-
-        Optional<JsonNode> committedDates = Optional.ofNullable(mapper.readTree(responseJson))
+        Optional<JsonNode> commits = Optional.ofNullable(mapper.readTree(responseJson))
                 .map(resp -> resp.get("data"))
                     .map(data -> data.get("repository"))
                         .map(repo -> repo.get("defaultBranchRef"))
                             .map(branch -> branch.get("target"))
                                 .map(tag -> tag.get("history"))
                                     .map(hist -> hist.get("nodes"));
-
-        return committedDates.orElse(null);
+        return commits.orElse( null);
     }
 
 
 }
+
+//{
+//repository(name: "react", owner: "facebook") {
+//defaultBranchRef {
+//target {
+//... on Commit {
+//history(first: 5) {
+//nodes {
+//committedDate
+//additions
+//deletions
+//changedFiles
+//author {
+//email
+//name
+//}
+//}
+//}
+//}
+//}
+//}
+//issues(first: 5, orderBy: {field: CREATED_AT, direction: DESC}) {
+//nodes {
+//state
+//closedAt
+//createdAt
+//title
+//url
+//}
+//}
+//primaryLanguage {
+//name
+//}
+//}
+//}
