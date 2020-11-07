@@ -32,6 +32,7 @@ public class GithubCommitService {
 
         for (GithubCommit githubCommit : entities) {
             GithubCommitDTO dto = modelMapper.map(githubCommit, GithubCommitDTO.class);
+            dto.setCommittedDate(githubCommit.getCommittedDate());
             githubCommitDTOS.add(dto);
         }
         return githubCommitDTOS;

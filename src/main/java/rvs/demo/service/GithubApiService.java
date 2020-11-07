@@ -18,7 +18,7 @@ public class GithubApiService {
 
     private Map<String, Object> graphQl;
 
-    private String token = "7a932d35a4ab732ccebd624311b0daa70fcd49af"; //todo get token from database
+    private String token = System.getenv("PVS_GITHUB_TOKEN"); //todo get token from database
 
     public GithubApiService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl("https://api.github.com/graphql")
