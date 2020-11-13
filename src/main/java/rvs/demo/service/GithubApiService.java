@@ -16,7 +16,7 @@ public class GithubApiService {
 
     private final WebClient webClient;
 
-    private Map<String, Object> graphQl;
+    private Map<String, Object> graphQlQuery;
 
     private String token = System.getenv("PVS_GITHUB_TOKEN"); //todo get token from database
 
@@ -26,7 +26,7 @@ public class GithubApiService {
                 .build();
     }
 
-    private void setGraphQl(String owner, String name) {
+    private void setGraphQlGetCommitsQuery(String owner, String name) {
         //todo get data since last commit date to now
         Map<String, Object> graphQl = new HashMap<>();
         graphQl.put("query", "{repository(owner: \"" + owner + "\", name:\"" + name + "\") {" +
@@ -49,14 +49,28 @@ public class GithubApiService {
                                     "}" +
                                 "}" +
                             "}}");
-        this.graphQl = graphQl;
+        this.graphQlQuery = graphQl;
+    }
+
+    private void setGraphQlGetIssuesQuery(String owner, String name) {
+        //todo get data since last commit date to now
+        Map<String, Object> graphQl = new HashMap<>();
+        graphQl.put("query", "{repository(owner: \"" + owner + "\", name:\"" + name + "\") {" +
+                                "issues (first:100) {" +
+                                    "nodes {" +
+                                        "createdAt\n" +
+                                        "closedAt\n" +
+                                    "}" +
+                                "}" +
+                            "}}");
+        this.graphQlQuery = graphQl;
     }
 
     public JsonNode getCommits(String owner, String name) throws IOException {
-        this.setGraphQl(owner, name);
+        this.setGraphQlGetCommitsQuery(owner, name);
         //todo use thread get commits from Github
         String responseJson = this.webClient.post()
-                .body(BodyInserters.fromObject(this.graphQl))
+                .body(BodyInserters.fromObject(this.graphQlQuery))
                 .exchange()
                 .block()
                 .bodyToMono(String.class)
@@ -77,7 +91,28 @@ public class GithubApiService {
         return commits.orElse( null);
     }
 
+    public JsonNode getIssues(String owner, String name) throws IOException {
+        this.setGraphQlGetIssuesQuery(owner, name);
+        //todo use thread get commits from Github
+        String responseJson = this.webClient.post()
+                .body(BodyInserters.fromObject(this.graphQlQuery))
+                .exchange()
+                .block()
+                .bodyToMono(String.class)
+                .block();
+        System.out.println(responseJson);
 
+        System.out.println("responseJson ====");
+        System.out.println(responseJson);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Optional<JsonNode> issues = Optional.ofNullable(mapper.readTree(responseJson))
+                .map(resp -> resp.get("data"))
+                    .map(data -> data.get("repository"))
+                        .map(repo -> repo.get("issues"))
+                            .map(issue -> issue.get("nodes"));
+        return issues.orElse( null);
+    }
 }
 
 //{

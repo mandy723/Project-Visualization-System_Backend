@@ -3,12 +3,16 @@ server:
   context-path: /pvs-api
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/pvs?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
-    username: root
+    url: jdbc:postgresql://localhost:5432/PVS
+    username: PVS
     password: lab1321
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: org.postgresql.Driver
   jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
+    properties:
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     generate-ddl: true
     show-sql: true
     hibernate:

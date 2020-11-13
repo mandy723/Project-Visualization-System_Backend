@@ -7,8 +7,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rvs.demo.model.GithubCommitDTO;
+import rvs.demo.model.GithubIssueDTO;
 import rvs.demo.service.GithubCommitService;
 import rvs.demo.service.GithubApiService;
+import rvs.demo.service.GithubIssueService;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,10 +23,36 @@ public class GithubApiController {
 
     private final GithubApiService githubApiService;
     private final GithubCommitService githubCommitService;
+    private final GithubIssueService githubIssueService;
 
-    public GithubApiController(GithubApiService githubApiService, GithubCommitService githubCommitService) {
+    public GithubApiController(GithubApiService githubApiService, GithubCommitService githubCommitService, GithubIssueService githubIssueService) {
         this.githubApiService = githubApiService;
         this.githubCommitService = githubCommitService;
+        this.githubIssueService = githubIssueService;
+    }
+
+    @PostMapping("/issues/{repoOwner}/{repoName}")
+    public ResponseEntity<String> postIssues(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException {
+        JsonNode responseJson = githubApiService.getIssues(repoOwner, repoName);
+
+        System.out.println("responseJson ========= ");
+        System.out.println(responseJson);
+
+        if(responseJson != null) {
+            responseJson.forEach(entity -> {
+                GithubIssueDTO githubIssueDTO = new GithubIssueDTO();
+                githubIssueDTO.setRepoOwner(repoOwner);
+                githubIssueDTO.setRepoName(repoName);
+                githubIssueDTO.setCreatedAt(entity.get("createdAt"));
+                githubIssueDTO.setClosedAt(entity.get("closedAt"));
+                githubIssueService.add(githubIssueDTO);
+            });
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body("Saving issues to database complete");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Can't find repository");
     }
 
     @PostMapping("/commits/{repoOwner}/{repoName}")
@@ -49,7 +77,6 @@ public class GithubApiController {
                 });
             return ResponseEntity.status(HttpStatus.OK)
                     .body("Saving commits to database complete");
-
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
