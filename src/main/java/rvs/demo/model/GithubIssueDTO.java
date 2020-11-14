@@ -31,6 +31,10 @@ public class GithubIssueDTO {
         return createdAt;
     }
 
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public void setCreatedAt(JsonNode createdAt) {
         DateTimeFormatter isoParser = ISODateTimeFormat.dateTimeNoMillis();
         this.createdAt = isoParser.parseDateTime(createdAt.toString().replace("\"", "")).toDate();
@@ -38,6 +42,10 @@ public class GithubIssueDTO {
 
     public Date getClosedAt() {
         return closedAt;
+    }
+
+    public void setClosedAt(Date closedAt) {
+        this.closedAt = closedAt;
     }
 
     public void setClosedAt(JsonNode closedAt) {

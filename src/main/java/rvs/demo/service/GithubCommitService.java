@@ -28,14 +28,14 @@ public class GithubCommitService {
 
     public List<GithubCommitDTO> getAllCommits(String repoOwner, String repoName) {
         List<GithubCommit> entities = githubCommitDAO.findByRepoOwnerAndRepoName(repoOwner, repoName);
-        List<GithubCommitDTO> githubCommitDTOS = new LinkedList<>();
+        List<GithubCommitDTO> githubCommitDTOs = new LinkedList<>();
 
         for (GithubCommit githubCommit : entities) {
             GithubCommitDTO dto = modelMapper.map(githubCommit, GithubCommitDTO.class);
             dto.setCommittedDate(githubCommit.getCommittedDate());
-            githubCommitDTOS.add(dto);
+            githubCommitDTOs.add(dto);
         }
-        return githubCommitDTOS;
+        return githubCommitDTOs;
     }
 
     public GithubCommitDTO getLastCommit(String repoOwner, String repoName) {

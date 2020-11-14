@@ -6,6 +6,9 @@ import rvs.demo.model.GithubIssue;
 import rvs.demo.model.GithubIssueDTO;
 import rvs.demo.repository.GithubIssueDAO;
 
+import java.util.LinkedList;
+import java.util.List;
+
 @Service
 public class GithubIssueService {
     private final GithubIssueDAO githubIssueDAO;
@@ -19,5 +22,19 @@ public class GithubIssueService {
     public void add(GithubIssueDTO githubIssueDTO) {
         GithubIssue githubIssue = modelMapper.map(githubIssueDTO, GithubIssue.class);
         githubIssueDAO.save(githubIssue);
+    }
+
+    public List<GithubIssueDTO> getAllIssues(String repoOwner, String repoName) {
+        List<GithubIssue> entities = githubIssueDAO.findByRepoOwnerAndRepoName(repoOwner, repoName);
+        List<GithubIssueDTO> githubIssueDTOs = new LinkedList<>();
+
+        for (GithubIssue githubIssue : entities) {
+            GithubIssueDTO dto = modelMapper.map(githubIssue, GithubIssueDTO.class);
+            dto.setCreatedAt(githubIssue.getCreatedAt());
+            dto.setClosedAt(githubIssue.getClosedAt());
+            githubIssueDTOs.add(dto);
+        }
+
+        return githubIssueDTOs;
     }
 }

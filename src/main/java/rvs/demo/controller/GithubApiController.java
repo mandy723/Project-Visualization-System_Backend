@@ -87,12 +87,25 @@ public class GithubApiController {
     public ResponseEntity<String> getCommits(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        List<GithubCommitDTO> githubCommitDTOS = githubCommitService.getAllCommits(repoOwner, repoName);
+        List<GithubCommitDTO> githubCommitDTOs = githubCommitService.getAllCommits(repoOwner, repoName);
 
-        String githubCommitDTOSJson = objectMapper.writeValueAsString(githubCommitDTOS);
-        System.out.println(githubCommitDTOSJson);
+        String githubCommitDTOsJson = objectMapper.writeValueAsString(githubCommitDTOs);
+        System.out.println(githubCommitDTOsJson);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(githubCommitDTOSJson);
+                .body(githubCommitDTOsJson);
+    }
+
+    @GetMapping("/issues/{repoOwner}/{repoName}")
+    public ResponseEntity<String> getIssues(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        List<GithubIssueDTO> githubIssueDTOs = githubIssueService.getAllIssues(repoOwner, repoName);
+
+        String githubIssueDTOsJson = objectMapper.writeValueAsString(githubIssueDTOs);
+        System.out.println(githubIssueDTOsJson);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(githubIssueDTOsJson);
     }
 }
