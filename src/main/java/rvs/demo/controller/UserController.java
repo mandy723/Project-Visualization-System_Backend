@@ -13,13 +13,11 @@ public class UserController {
 
     @GetMapping("/admin/hello")
     public Map<String, String> adminSayHello() {
-        Map<String, String> result = Map.of("message", "admin say hello");
-        return result;
+        return Map.of("message", "admin say hello");
     }
 
     @GetMapping("/user/hello")
     public Map<String, String> userSayHello() {
-        Map<String, String> result = Map.of("message", "user say hello");
-        return result;
+        return Map.of("message", "user say hello");
     }
 }

@@ -2,6 +2,8 @@ package rvs.demo.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +18,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:3001")
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class GithubApiController {
+
+    static final Logger logger = LogManager.getLogger(GithubApiController.class.getName());
 
     private final GithubApiService githubApiService;
     private final GithubCommitService githubCommitService;
@@ -35,8 +38,8 @@ public class GithubApiController {
     public ResponseEntity<String> postIssues(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException {
         JsonNode responseJson = githubApiService.getIssues(repoOwner, repoName);
 
-        System.out.println("responseJson ========= ");
-        System.out.println(responseJson);
+        logger.debug("responseJson ========= ");
+        logger.debug(responseJson);
 
         if(responseJson != null) {
             responseJson.forEach(entity -> {
@@ -59,8 +62,8 @@ public class GithubApiController {
     public ResponseEntity<String> postCommits(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException {
         JsonNode responseJson = githubApiService.getCommits(repoOwner, repoName);
 
-        System.out.println("responseJson ========= ");
-        System.out.println(responseJson);
+        logger.debug("responseJson ========= ");
+        logger.debug(responseJson);
 
         if(responseJson != null) {
             responseJson.forEach(entity->{
@@ -85,12 +88,13 @@ public class GithubApiController {
 
     @GetMapping("/commits/{repoOwner}/{repoName}")
     public ResponseEntity<String> getCommits(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException {
+
         ObjectMapper objectMapper = new ObjectMapper();
 
         List<GithubCommitDTO> githubCommitDTOs = githubCommitService.getAllCommits(repoOwner, repoName);
 
         String githubCommitDTOsJson = objectMapper.writeValueAsString(githubCommitDTOs);
-        System.out.println(githubCommitDTOsJson);
+        logger.debug(githubCommitDTOsJson);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(githubCommitDTOsJson);
@@ -103,7 +107,7 @@ public class GithubApiController {
         List<GithubIssueDTO> githubIssueDTOs = githubIssueService.getAllIssues(repoOwner, repoName);
 
         String githubIssueDTOsJson = objectMapper.writeValueAsString(githubIssueDTOs);
-        System.out.println(githubIssueDTOsJson);
+        logger.debug(githubIssueDTOsJson);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(githubIssueDTOsJson);

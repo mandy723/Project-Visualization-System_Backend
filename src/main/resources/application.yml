@@ -1,7 +1,14 @@
 server:
   port: 9100
-  context-path: /pvs-api
+  servlet:
+    context-path: /pvs-api
+
+logging:
+  config: classpath:log4j2.xml
+
 spring:
+  profiles:
+    active: test
   datasource:
     url: jdbc:postgresql://localhost:5432/PVS
     username: PVS
@@ -17,6 +24,3 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
-  profiles:
-    active: test
-frontend: http://localhost:3000

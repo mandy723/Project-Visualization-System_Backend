@@ -45,8 +45,6 @@ public class GithubCommit {
     @Column(name="AUTHOR_EMAIL")
     private String authorEmail;
 
-    public GithubCommit(){}
-
     public String getRepoOwner() {
         return repoOwner;
     }

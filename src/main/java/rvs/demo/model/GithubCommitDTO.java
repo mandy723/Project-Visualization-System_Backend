@@ -82,10 +82,8 @@ public class GithubCommitDTO {
     }
 
     public void setAuthor(Optional<JsonNode> authorJson) {
-        Optional<JsonNode> authorName = authorJson.map(s -> s.get("name"));
-        Optional<JsonNode> authorEmail = authorJson.map(s -> s.get("email"));
-        authorName.ifPresent(s -> this.authorName = s.toString());
-        authorEmail.ifPresent(s -> this.authorEmail = s.toString());
+        authorJson.map(s -> s.get("name")).ifPresent(s -> this.authorName = s.toString());
+        authorJson.map(s -> s.get("email")).ifPresent(s -> this.authorEmail = s.toString());
     }
 
     public void setCommittedDate(JsonNode committedDate) {

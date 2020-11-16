@@ -2,6 +2,8 @@ package rvs.demo.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,6 +15,8 @@ import java.util.Optional;
 
 @Service
 public class GithubApiService {
+
+    static final Logger logger = LogManager.getLogger(GithubApiService.class.getName());
 
     private final WebClient webClient;
 
@@ -75,10 +79,9 @@ public class GithubApiService {
                 .block()
                 .bodyToMono(String.class)
                 .block();
-        System.out.println(responseJson);
 
-        System.out.println("responseJson ====");
-        System.out.println(responseJson);
+        logger.debug("responseJson ====");
+        logger.debug(responseJson);
 
         ObjectMapper mapper = new ObjectMapper();
         Optional<JsonNode> commits = Optional.ofNullable(mapper.readTree(responseJson))
@@ -100,10 +103,9 @@ public class GithubApiService {
                 .block()
                 .bodyToMono(String.class)
                 .block();
-        System.out.println(responseJson);
 
-        System.out.println("responseJson ====");
-        System.out.println(responseJson);
+        logger.debug("responseJson ====");
+        logger.debug(responseJson);
 
         ObjectMapper mapper = new ObjectMapper();
         Optional<JsonNode> issues = Optional.ofNullable(mapper.readTree(responseJson))
@@ -114,38 +116,3 @@ public class GithubApiService {
         return issues.orElse( null);
     }
 }
-
-//{
-//repository(name: "react", owner: "facebook") {
-//defaultBranchRef {
-//target {
-//... on Commit {
-//history(first: 5) {
-//nodes {
-//committedDate
-//additions
-//deletions
-//changedFiles
-//author {
-//email
-//name
-//}
-//}
-//}
-//}
-//}
-//}
-//issues(first: 5, orderBy: {field: CREATED_AT, direction: DESC}) {
-//nodes {
-//state
-//closedAt
-//createdAt
-//title
-//url
-//}
-//}
-//primaryLanguage {
-//name
-//}
-//}
-//}
