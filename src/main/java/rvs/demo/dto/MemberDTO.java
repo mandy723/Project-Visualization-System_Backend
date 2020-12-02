@@ -1,4 +1,4 @@
-package rvs.demo.model;
+package rvs.demo.dto;
 
 public class MemberDTO {
 

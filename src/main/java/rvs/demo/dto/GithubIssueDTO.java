@@ -1,4 +1,4 @@
-package rvs.demo.model;
+package rvs.demo.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.joda.time.format.ISODateTimeFormat;
