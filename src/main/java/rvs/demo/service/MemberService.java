@@ -2,8 +2,8 @@ package rvs.demo.service;
 
 import org.springframework.stereotype.Service;
 import rvs.demo.model.Member;
-import rvs.demo.model.MemberDTO;
-import rvs.demo.repository.MemberDAO;
+import rvs.demo.dto.MemberDTO;
+import rvs.demo.dao.MemberDAO;
 
 @Service
 public class MemberService {

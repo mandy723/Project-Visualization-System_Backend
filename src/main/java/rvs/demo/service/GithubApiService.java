@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import rvs.demo.dto.GithubCommitDTO;
 
 import java.io.IOException;
 import java.util.HashMap;

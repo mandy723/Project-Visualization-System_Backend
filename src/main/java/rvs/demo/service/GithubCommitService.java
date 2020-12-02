@@ -3,8 +3,8 @@ package rvs.demo.service;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import rvs.demo.model.GithubCommit;
-import rvs.demo.model.GithubCommitDTO;
-import rvs.demo.repository.GithubCommitDAO;
+import rvs.demo.dto.GithubCommitDTO;
+import rvs.demo.dao.GithubCommitDAO;
 
 import java.util.Date;
 import java.util.LinkedList;

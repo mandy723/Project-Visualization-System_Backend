@@ -9,8 +9,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import rvs.demo.Application;
 import rvs.demo.model.GithubCommit;
-import rvs.demo.model.GithubCommitDTO;
-import rvs.demo.repository.GithubCommitDAO;
+import rvs.demo.dto.GithubCommitDTO;
+import rvs.demo.dao.GithubCommitDAO;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
