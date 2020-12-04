@@ -1,4 +1,4 @@
-package rvs.demo.repository;
+package rvs.demo.dao;
 
 import org.junit.Before;
 import org.junit.Test;

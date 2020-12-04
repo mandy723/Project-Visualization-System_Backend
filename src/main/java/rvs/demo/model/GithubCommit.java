@@ -5,7 +5,6 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Entity
-@Table(name = "github_commit")
 public class GithubCommit {
 
     @Id
@@ -14,36 +13,32 @@ public class GithubCommit {
     private Long id;
 
     @NotNull
-    @Column(name="REPO_OWNER")
     private String repoOwner;
 
     @NotNull
-    @Column(name="REPO_NAME")
     private String repoName;
 
     @NotNull
-    @Column(name="COMMITTED_DATE")
     private Date committedDate;
 
     @NotNull
-    @Column(name="ADDITIONS")
     private int additions;
 
     @NotNull
-    @Column(name="DELETIONS")
     private int deletions;
 
     @NotNull
-    @Column(name="CHANGE_FILES")
     private int changeFiles;
 
     @NotNull
-    @Column(name="AUTHOR_NAME")
     private String authorName;
 
     @NotNull
-    @Column(name="AUTHOR_EMAIL")
     private String authorEmail;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="repository_id")
+    private Repository repository;
 
     public String getRepoOwner() {
         return repoOwner;

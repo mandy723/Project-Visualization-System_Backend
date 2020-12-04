@@ -3,7 +3,7 @@ package rvs.demo.model;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "member")
+@Table
 public class Member {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)

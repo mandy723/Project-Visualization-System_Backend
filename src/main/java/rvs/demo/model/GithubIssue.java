@@ -5,7 +5,6 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Entity
-@Table(name = "github_issue")
 public class GithubIssue {
 
     @Id
@@ -14,20 +13,20 @@ public class GithubIssue {
     private Long id;
 
     @NotNull
-    @Column(name = "REPO_OWNER")
     private String repoOwner;
 
     @NotNull
-    @Column(name = "REPO_NAME")
     private String repoName;
 
     @NotNull
-    @Column(name = "CREATED_AT")
     private Date createdAt;
 
     @NotNull
-    @Column(name = "CLOSED_AT")
     private Date closedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="repository_id")
+    private Repository repository;
 
     public String getRepoOwner() {
         return repoOwner;
