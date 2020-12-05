@@ -6,10 +6,10 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Logger name="rvs.demo.controller.GithubApiController" level="debug">
+        <Logger name="pvs.app.controller.GithubApiController" level="debug">
             <AppenderRef ref="Console"/>
         </Logger>
-        <Logger name="rvs.demo.service.GithubApiService" level="debug">
+        <Logger name="pvs.app.service.GithubApiService" level="debug">
             <AppenderRef ref="Console"/>
         </Logger>
         <Root level="error">
