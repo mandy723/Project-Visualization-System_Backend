@@ -14,6 +14,7 @@ import pvs.app.service.GithubCommitService;
 import pvs.app.service.GithubApiService;
 import pvs.app.service.GithubIssueService;
 
+import javax.persistence.Column;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
