@@ -15,6 +15,9 @@
         <Logger name="pvs.app.service.GithubApiService" level="debug">
             <AppenderRef ref="Console"/>
         </Logger>
+        <Logger name="pvs.app.service.RepositoryService" level="debug">
+            <AppenderRef ref="Console"/>
+        </Logger>
         <Root level="error">
             <AppenderRef ref="Console"/>
         </Root>
