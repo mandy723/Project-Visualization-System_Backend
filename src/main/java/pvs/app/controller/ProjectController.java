@@ -28,6 +28,7 @@ public class ProjectController {
         try{
             if(repositoryService.checkURL(projectDTO.getRepositoryURL())) {
                 projectService.create(projectDTO);
+
                 return ResponseEntity.status(HttpStatus.OK).body("你成功了");
             }
             else {
@@ -43,8 +44,8 @@ public class ProjectController {
         List<ResponseProjectDTO> projectList = projectService.getMemberProjects(memberId);
         return ResponseEntity.status(HttpStatus.OK).body(projectList);
         //-/-/-/-/-/-/-/-/-/-/
-        //    0        0     //
-        //         3
-        //////////\\\\\\\\\\\
+        //    0        0    //
+        //         3        //
+        //////////\\\\\\\\\\\\
     }
 }

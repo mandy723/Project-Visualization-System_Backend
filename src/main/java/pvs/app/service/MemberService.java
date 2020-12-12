@@ -14,7 +14,7 @@ public class MemberService {
         this.memberDAO = memberDAO;
     }
 
-    public void add(MemberDTO bo) {
+    public void save(MemberDTO bo) {
         Member entity = new Member();
         entity.setAccount(bo.getAccount());
         entity.setPassword(bo.getPassword());

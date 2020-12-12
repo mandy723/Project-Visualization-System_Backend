@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
+
 @Data
 @Entity
 public class Project {
@@ -16,8 +17,12 @@ public class Project {
 
     @NotNull
     private Long memberId;
+
     @NotNull
     private String name;
+
+    @NotNull
+    private String avatarURL = "https://avatars3.githubusercontent.com/u/17744001?u=038d9e068c4205d94c670d7d89fb921ec5b29782&v=4";
 
     @ManyToMany(cascade = { CascadeType.ALL },fetch=FetchType.EAGER)
     @JoinTable(

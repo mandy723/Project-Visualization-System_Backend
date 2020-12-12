@@ -14,10 +14,8 @@ import pvs.app.service.GithubCommitService;
 import pvs.app.service.GithubApiService;
 import pvs.app.service.GithubIssueService;
 
-import javax.persistence.Column;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -49,7 +47,7 @@ public class GithubApiController {
                 githubIssueDTO.setRepoName(repoName);
                 githubIssueDTO.setCreatedAt(entity.get("createdAt"));
                 githubIssueDTO.setClosedAt(entity.get("closedAt"));
-                githubIssueService.add(githubIssueDTO);
+                githubIssueService.save(githubIssueDTO);
             });
 
             return ResponseEntity.status(HttpStatus.OK)
@@ -67,24 +65,9 @@ public class GithubApiController {
         logger.debug(responseJson);
 
         if(responseJson != null) {
-            responseJson.forEach(entity->{
-                //todo discuss
-                    GithubCommitDTO githubCommitDTO = new GithubCommitDTO();
-                    githubCommitDTO.setRepoOwner(repoOwner);
-                    githubCommitDTO.setRepoName(repoName);
-                    githubCommitDTO.setAdditions(Integer.parseInt(entity.get("additions").toString()));
-                    githubCommitDTO.setDeletions(Integer.parseInt(entity.get("deletions").toString()));
-                    githubCommitDTO.setCommittedDate(entity.get("committedDate"));
-                    githubCommitDTO.setAuthor(Optional.ofNullable(entity.get("author")));
-                    githubCommitDTO.setChangeFiles(Integer.parseInt(entity.get("changedFiles").toString()));
-                    githubCommitService.add(githubCommitDTO);
-                });
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body("Saving commits to database complete");
+            return ResponseEntity.status(HttpStatus.OK).body("");
         }
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Can't find repository");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("");
     }
 
     @GetMapping("/commits/{repoOwner}/{repoName}")

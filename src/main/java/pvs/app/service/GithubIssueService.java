@@ -19,7 +19,7 @@ public class GithubIssueService {
         this.modelMapper = modelMapper;
     }
 
-    public void add(GithubIssueDTO githubIssueDTO) {
+    public void save(GithubIssueDTO githubIssueDTO) {
         GithubIssue githubIssue = modelMapper.map(githubIssueDTO, GithubIssue.class);
         githubIssueDAO.save(githubIssue);
     }

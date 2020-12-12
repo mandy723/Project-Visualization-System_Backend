@@ -21,7 +21,7 @@ public class GithubCommitService {
         this.modelMapper = modelMapper;
     }
 
-    public void add(GithubCommitDTO githubCommitDTO) {
+    public void save(GithubCommitDTO githubCommitDTO) {
         GithubCommit githubCommit = modelMapper.map(githubCommitDTO, GithubCommit.class);
         githubCommitDAO.save(githubCommit);
     }

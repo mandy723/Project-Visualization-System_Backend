@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import pvs.app.dto.GithubCommitDTO;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -24,7 +25,10 @@ public class GithubApiService {
 
     private String token = System.getenv("PVS_GITHUB_TOKEN"); //todo get token from database
 
-    public GithubApiService(WebClient.Builder webClientBuilder) {
+    private final GithubCommitService githubCommitService;
+
+    public GithubApiService(WebClient.Builder webClientBuilder, GithubCommitService githubCommitService) {
+        this.githubCommitService = githubCommitService;
         this.webClient = webClientBuilder.baseUrl("https://api.github.com/graphql")
                 .defaultHeader("Authorization", "Bearer " + token )
                 .build();
@@ -70,6 +74,24 @@ public class GithubApiService {
         this.graphQlQuery = graphQl;
     }
 
+    private void setGraphQlGetAvatarQuery(String owner) {
+        //todo get data since last commit date to now
+        Map<String, Object> graphQl = new HashMap<>();
+        graphQl.put("query", "{search(type: USER, query: \"in:username " + owner + "\", first: 1) {" +
+                    "edges {" +
+                        "node {" +
+                            "... on User {" +
+                                "avatarUrl" +
+                            "}" +
+                            "... on Organization {" +
+                                "avatarUrl" +
+                            "}" +
+                        "}" +
+                    "}}}");
+
+        this.graphQlQuery = graphQl;
+    }
+
     public JsonNode getCommits(String owner, String name) throws IOException {
         this.setGraphQlGetCommitsQuery(owner, name);
         //todo use thread get commits from Github
@@ -91,6 +113,20 @@ public class GithubApiService {
                             .map(branch -> branch.get("target"))
                                 .map(tag -> tag.get("history"))
                                     .map(hist -> hist.get("nodes"));
+
+        commits.get().forEach(entity->{
+            //todo discuss
+            GithubCommitDTO githubCommitDTO = new GithubCommitDTO();
+            githubCommitDTO.setRepoOwner(owner);
+            githubCommitDTO.setRepoName(name);
+            githubCommitDTO.setAdditions(Integer.parseInt(entity.get("additions").toString()));
+            githubCommitDTO.setDeletions(Integer.parseInt(entity.get("deletions").toString()));
+            githubCommitDTO.setCommittedDate(entity.get("committedDate"));
+            githubCommitDTO.setAuthor(Optional.ofNullable(entity.get("author")));
+            githubCommitDTO.setChangeFiles(Integer.parseInt(entity.get("changedFiles").toString()));
+            githubCommitService.save(githubCommitDTO);
+        });
+
         return commits.orElse( null);
     }
 
@@ -114,5 +150,28 @@ public class GithubApiService {
                         .map(repo -> repo.get("issues"))
                             .map(issue -> issue.get("nodes"));
         return issues.orElse( null);
+    }
+
+    public JsonNode getAvatarURL(String owner) throws IOException {
+        this.setGraphQlGetAvatarQuery(owner);
+        //todo use thread get commits from Github
+        String responseJson = this.webClient.post()
+                .body(BodyInserters.fromObject(this.graphQlQuery))
+                .exchange()
+                .block()
+                .bodyToMono(String.class)
+                .block();
+
+        logger.debug("responseJson ====");
+        logger.debug(responseJson);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Optional<JsonNode> avatar = Optional.ofNullable(mapper.readTree(responseJson))
+                .map(resp -> resp.get("data"))
+                .map(data -> data.get("search"))
+                .map(search -> search.get("edges").get(0))
+                .map(edges -> edges.get("node"))
+                .map(node -> node.get("avatarUrl"));
+        return avatar.orElse( null);
     }
 }
