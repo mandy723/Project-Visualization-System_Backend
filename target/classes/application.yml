@@ -1,0 +1,26 @@
+server:
+  port: 9100
+  servlet:
+    context-path: /pvs-api
+
+logging:
+  config: classpath:log4j2.xml
+
+spring:
+  profiles:
+    active: test
+  datasource:
+    url: jdbc:postgresql://localhost:5432/PVS
+    username: PVS
+    password: lab1321
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: true
+    show-sql: true
+    hibernate:
+      ddl-auto: update
