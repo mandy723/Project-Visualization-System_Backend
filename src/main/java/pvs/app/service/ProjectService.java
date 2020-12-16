@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import pvs.app.dao.ProjectDAO;
 import pvs.app.dto.CreateProjectDTO;
+import pvs.app.dto.RepositoryDTO;
 import pvs.app.dto.ResponseProjectDTO;
 import pvs.app.entity.Project;
 import pvs.app.entity.Repository;
@@ -71,6 +72,12 @@ public class ProjectService {
             projectDTO.setProjectId(project.getProjectId());
             projectDTO.setProjectName(project.getName());
             projectDTO.setAvatarURL(project.getAvatarURL());
+            for(Repository repository: project.getRepositorySet()) {
+                RepositoryDTO repositoryDTO = new RepositoryDTO();
+                repositoryDTO.setUrl(repository.getUrl());
+                repositoryDTO.setType(repository.getType());
+                projectDTO.getRepositoryDTOList().add(repositoryDTO);
+            }
             projectDTOList.add(projectDTO);
         }
         return projectDTOList;

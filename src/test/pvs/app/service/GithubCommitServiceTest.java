@@ -62,17 +62,17 @@ public class GithubCommitServiceTest {
         assertEquals(2, githubCommits.size());
     }
 
-//    @Test
-//    public void get_last_commit() throws ParseException {
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // 日期格式
-//
-//        when(githubCommitDAO.findFirstByRepoOwnerAndRepoNameOrderByCommittedDateDesc("facebook", "react"))
-//                .thenReturn(mockGithubCommits.get(1));
-//
-//        GithubCommitDTO githubCommit = githubCommitService.getLastCommit("facebook", "react");
-//
-//        assertEquals(dateFormat.parse("2020-12-30 11:11:11"), githubCommit.getCommittedDate());
-//    }
+    @Test
+    public void get_last_commit() throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // 日期格式
+
+        when(githubCommitDAO.findFirstByRepoOwnerAndRepoNameOrderByCommittedDateDesc("facebook", "react"))
+                .thenReturn(mockGithubCommits.get(1));
+
+        GithubCommitDTO githubCommit = githubCommitService.getLastCommit("facebook", "react");
+
+        assertEquals(dateFormat.parse("2020-12-30 11:11:11"), githubCommit.getCommittedDate());
+    }
 
 
 }
