@@ -1,8 +1,11 @@
 package pvs.app.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import pvs.app.service.GithubApiService;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -12,6 +15,10 @@ import java.util.Optional;
 import java.util.TimeZone;
 
 public class GithubCommitDTO {
+
+    static final Logger logger = LogManager.getLogger(GithubCommitDTO.class.getName());
+
+
     private String repoOwner;
     private String repoName;
     private Date committedDate;
@@ -38,10 +45,13 @@ public class GithubCommitDTO {
     }
 
     public Date getCommittedDate() {
+        logger.debug(committedDate);
         return committedDate;
     }
 
     public void setCommittedDate(Date committedDate) {
+        logger.debug("Jayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
+
         this.committedDate = committedDate;
     }
 
@@ -59,14 +69,6 @@ public class GithubCommitDTO {
 
     public void setDeletions(int deletions) {
         this.deletions = deletions;
-    }
-
-    public int getChangeFiles() {
-        return changeFiles;
-    }
-
-    public void setChangeFiles(int changeFiles) {
-        this.changeFiles = changeFiles;
     }
 
     public String getAuthorName() {
@@ -91,6 +93,9 @@ public class GithubCommitDTO {
     }
 
     public void setCommittedDate(JsonNode committedDate) {
+
+        logger.debug("Timmmmmmmmmmmmmmmmmmmm");
+
         DateTimeFormatter isoParser = ISODateTimeFormat.dateTimeNoMillis();
         this.committedDate =
                 isoParser.parseDateTime(committedDate.toString().replace("\"", "")).toDate();

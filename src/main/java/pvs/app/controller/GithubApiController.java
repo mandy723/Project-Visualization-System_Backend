@@ -15,6 +15,8 @@ import pvs.app.service.GithubApiService;
 import pvs.app.service.GithubIssueService;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -59,15 +61,27 @@ public class GithubApiController {
 
     @PostMapping("/commits/{repoOwner}/{repoName}")
     public ResponseEntity<String> postCommits(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException {
-        JsonNode responseJson = githubApiService.getCommits(repoOwner, repoName);
-
-        logger.debug("responseJson ========= ");
-        logger.debug(responseJson);
-
-        if(responseJson != null) {
-            return ResponseEntity.status(HttpStatus.OK).body("");
+        Date lastUpdate;
+        GithubCommitDTO githubCommitDTO = githubCommitService.getLastCommit(repoOwner, repoName);
+        logger.debug(githubCommitDTO.getRepoName());
+        if (null == githubCommitDTO) {
+            logger.debug("Noraaaaaaaaaaaaaaaaaaaaaaaaaa");
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(1970, Calendar.JANUARY, 1);
+            lastUpdate = calendar.getTime();
+        } else {
+            logger.debug("Oliviaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+            lastUpdate = githubCommitDTO.getCommittedDate();
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("");
+
+        logger.debug(lastUpdate);
+
+        try {
+            githubApiService.getCommitsFromGithub(repoOwner, repoName, lastUpdate);
+            return ResponseEntity.status(HttpStatus.OK).body("");
+        } catch (InterruptedException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("");
+        }
     }
 
     @GetMapping("/commits/{repoOwner}/{repoName}")

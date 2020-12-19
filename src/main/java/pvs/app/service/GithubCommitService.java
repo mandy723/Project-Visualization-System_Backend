@@ -1,7 +1,10 @@
 package pvs.app.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import pvs.app.controller.GithubApiController;
 import pvs.app.entity.GithubCommit;
 import pvs.app.dto.GithubCommitDTO;
 import pvs.app.dao.GithubCommitDAO;
@@ -12,6 +15,9 @@ import java.util.List;
 
 @Service
 public class GithubCommitService {
+
+    static final Logger logger = LogManager.getLogger(GithubCommitService.class.getName());
+
 
     private final GithubCommitDAO githubCommitDAO;
     private final ModelMapper modelMapper;
@@ -40,7 +46,13 @@ public class GithubCommitService {
 
     public GithubCommitDTO getLastCommit(String repoOwner, String repoName) {
         GithubCommit githubCommit = githubCommitDAO.findFirstByRepoOwnerAndRepoNameOrderByCommittedDateDesc(repoOwner, repoName);
-        return modelMapper.map(githubCommit, GithubCommitDTO.class);
+        if(null == githubCommit) {
+            logger.debug("NONONONONONONONONONONOONONONONO");
+            return null;
+        }
+        GithubCommitDTO dto = modelMapper.map(githubCommit, GithubCommitDTO.class);
+        dto.setCommittedDate(githubCommit.getCommittedDate());
+        return dto;
     }
 
     public GithubCommitDTO getCommit(String repoOwner, String repoName, Date committedDate) {
