@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import pvs.app.dto.GithubCommitDTO;
+import pvs.app.dto.GithubIssueDTO;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -43,7 +44,6 @@ public class GithubApiService {
 
     private void setGraphQlGetCommitsTotalCountAndCursorQuery(String owner, String name, Date lastUpdate) {
         String since = dateToISO8601(lastUpdate);
-        //todo get data since last commit date to now
         Map<String, Object> graphQl = new HashMap<>();
         graphQl.put("query", "{repository(owner: \"" + owner + "\", name:\"" + name + "\") {" +
                             "defaultBranchRef {" +
@@ -59,6 +59,16 @@ public class GithubApiService {
                                 "}" +
                             "}" +
                         "}}");
+        this.graphQlQuery = graphQl;
+    }
+
+    private void setGraphQlGetIssuesTotalCountQuery(String owner, String name) {
+        Map<String, Object> graphQl = new HashMap<>();
+        graphQl.put("query", "{repository(owner: \"" + owner + "\", name:\"" + name + "\") {" +
+                                "issues (first: 100) {" +
+                                    "totalCount" +
+                                "}" +
+                            "}}");
         this.graphQlQuery = graphQl;
     }
 
@@ -95,7 +105,6 @@ public class GithubApiService {
     }
 
     public void getCommitsFromGithub(String owner, String name, Date lastUpdate) throws IOException, InterruptedException {
-        logger.debug(lastUpdate);
         this.setGraphQlGetCommitsTotalCountAndCursorQuery(owner, name, lastUpdate);
 
         String responseJson = this.webClient.post()
@@ -104,9 +113,6 @@ public class GithubApiService {
                 .block()
                 .bodyToMono(String.class)
                 .block();
-
-        logger.debug("responseJson ====");
-        logger.debug(responseJson);
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -139,10 +145,50 @@ public class GithubApiService {
                 thread.join();
             }
         }
-//
-//        this.setGraphQlGetCommitsQuery(owner, name, lastUpdate);
-//        // todo use thread get commits from Github
-//        responseJson = this.webClient.post()
+    }
+
+    public List<GithubIssueDTO> getIssuesFromGithub(String owner, String name) throws IOException, InterruptedException  {
+        List<GithubIssueDTO> githubIssueDTOList = new ArrayList<>();
+        this.setGraphQlGetIssuesTotalCountQuery(owner, name);
+
+        String responseJson = this.webClient.post()
+                .body(BodyInserters.fromObject(this.graphQlQuery))
+                .exchange()
+                .block()
+                .bodyToMono(String.class)
+                .block();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        Optional<JsonNode> paginationInfo = Optional.ofNullable(mapper.readTree(responseJson))
+                .map(resp -> resp.get("data"))
+                .map(data -> data.get("repository"))
+                .map(repo -> repo.get("issues"));
+
+        logger.debug(paginationInfo);
+        double totalCount = paginationInfo.get().get("totalCount").asInt();
+        List<GithubIssueLoaderThread> githubIssueLoaderThreadList = new ArrayList<>();
+
+        if (totalCount != 0) {
+
+            for (int i = 1; i <= Math.ceil(totalCount/100); i++) {
+                GithubIssueLoaderThread githubIssueLoaderThread =
+                        new GithubIssueLoaderThread(
+                                githubIssueDTOList,
+                                owner,
+                                name,
+                                i);
+                githubIssueLoaderThreadList.add(githubIssueLoaderThread);
+                githubIssueLoaderThread.start();
+            }
+
+            for (GithubIssueLoaderThread thread: githubIssueLoaderThreadList) {
+                thread.join();
+            }
+        }
+//        this.setGraphQlGetIssuesQuery(owner, name);
+//        //todo use thread get commits from Github
+//        String responseJson = this.webClient.post()
 //                .body(BodyInserters.fromObject(this.graphQlQuery))
 //                .exchange()
 //                .block()
@@ -152,50 +198,13 @@ public class GithubApiService {
 //        logger.debug("responseJson ====");
 //        logger.debug(responseJson);
 //
-//        Optional<JsonNode> commits = Optional.ofNullable(mapper.readTree(responseJson))
+//        ObjectMapper mapper = new ObjectMapper();
+//        Optional<JsonNode> issues = Optional.ofNullable(mapper.readTree(responseJson))
 //                .map(resp -> resp.get("data"))
 //                    .map(data -> data.get("repository"))
-//                        .map(repo -> repo.get("defaultBranchRef"))
-//                            .map(branch -> branch.get("target"))
-//                                .map(tag -> tag.get("history"))
-//                                    .map(hist -> hist.get("nodes"));
-//
-//        commits.get().forEach(entity->{
-//            //todo discuss
-//            GithubCommitDTO githubCommitDTO = new GithubCommitDTO();
-//            githubCommitDTO.setRepoOwner(owner);
-//            githubCommitDTO.setRepoName(name);
-//            githubCommitDTO.setAdditions(Integer.parseInt(entity.get("additions").toString()));
-//            githubCommitDTO.setDeletions(Integer.parseInt(entity.get("deletions").toString()));
-//            githubCommitDTO.setCommittedDate(entity.get("committedDate"));
-//            githubCommitDTO.setAuthor(Optional.ofNullable(entity.get("author")));
-//            githubCommitDTO.setChangeFiles(Integer.parseInt(entity.get("changedFiles").toString()));
-//            githubCommitService.save(githubCommitDTO);
-//        });
-//
-//        return commits.orElse( null);
-    }
-
-    public JsonNode getIssues(String owner, String name) throws IOException {
-        this.setGraphQlGetIssuesQuery(owner, name);
-        //todo use thread get commits from Github
-        String responseJson = this.webClient.post()
-                .body(BodyInserters.fromObject(this.graphQlQuery))
-                .exchange()
-                .block()
-                .bodyToMono(String.class)
-                .block();
-
-        logger.debug("responseJson ====");
-        logger.debug(responseJson);
-
-        ObjectMapper mapper = new ObjectMapper();
-        Optional<JsonNode> issues = Optional.ofNullable(mapper.readTree(responseJson))
-                .map(resp -> resp.get("data"))
-                    .map(data -> data.get("repository"))
-                        .map(repo -> repo.get("issues"))
-                            .map(issue -> issue.get("nodes"));
-        return issues.orElse( null);
+//                        .map(repo -> repo.get("issues"))
+//                            .map(issue -> issue.get("nodes"));
+        return githubIssueDTOList;
     }
 
     public JsonNode getAvatarURL(String owner) throws IOException {
@@ -298,6 +307,60 @@ class GithubCommitLoaderThread extends Thread {
 
             synchronized (lock) {
                 githubCommitService.save(githubCommitDTO);
+            }
+        });
+    }
+}
+
+class GithubIssueLoaderThread extends Thread {
+
+    private final String token = System.getenv("PVS_GITHUB_TOKEN"); //todo get token from database
+    private static Object lock = new Object();
+    static final Logger logger = LogManager.getLogger(GithubIssueLoaderThread.class.getName());
+
+    private List<GithubIssueDTO> githubIssueDTOList;
+    private String repoOwner;
+    private String repoName;
+    private String cursor;
+    private WebClient webClient;
+    private int page;
+
+
+    GithubIssueLoaderThread(List<GithubIssueDTO> githubIssueDTOList, String repoOwner, String repoName, int page) {
+        this.webClient = WebClient.builder().baseUrl("https://api.github.com/repos")
+                .defaultHeader("Authorization", "Bearer " + token )
+                .build();
+        this.githubIssueDTOList = githubIssueDTOList;
+        this.repoOwner = repoOwner;
+        this.repoName = repoName;
+        this.page = page;
+    }
+
+    @SneakyThrows
+    public void run() {
+        String responseJson = this.webClient.get()
+                .uri("/"+ this.repoOwner +"/"+ this.repoName +"/issues?page="+ this.page +"&per_page=100&state=all")
+                .exchange()
+                .block()
+                .bodyToMono(String.class)
+                .block();
+        ObjectMapper mapper = new ObjectMapper();
+
+        Optional<JsonNode> issueList = Optional.ofNullable(mapper.readTree(responseJson));
+
+
+        issueList.get().forEach(entity->{
+            GithubIssueDTO githubIssueDTO = new GithubIssueDTO();
+            githubIssueDTO.setRepoOwner(repoOwner);
+            githubIssueDTO.setRepoName(repoName);
+            githubIssueDTO.setCreatedAt(entity.get("created_at"));
+            githubIssueDTO.setClosedAt(entity.get("closed_at"));
+
+            logger.debug("==================");
+            logger.debug(githubIssueDTO);
+
+            synchronized (lock) {
+                githubIssueDTOList.add(githubIssueDTO);
             }
         });
     }

@@ -24,6 +24,9 @@
         <Logger name="pvs.app.dto.GithubCommitDTO" level="debug">
             <AppenderRef ref="Console"/>
         </Logger>
+        <Logger name="pvs.app.service.GithubIssueLoaderThread" level="debug">
+            <AppenderRef ref="Console"/>
+        </Logger>
         <Root level="error">
             <AppenderRef ref="Console"/>
         </Root>

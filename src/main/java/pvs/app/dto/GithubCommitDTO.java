@@ -50,8 +50,6 @@ public class GithubCommitDTO {
     }
 
     public void setCommittedDate(Date committedDate) {
-        logger.debug("Jayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
-
         this.committedDate = committedDate;
     }
 
@@ -93,8 +91,6 @@ public class GithubCommitDTO {
     }
 
     public void setCommittedDate(JsonNode committedDate) {
-
-        logger.debug("Timmmmmmmmmmmmmmmmmmmm");
 
         DateTimeFormatter isoParser = ISODateTimeFormat.dateTimeNoMillis();
         this.committedDate =

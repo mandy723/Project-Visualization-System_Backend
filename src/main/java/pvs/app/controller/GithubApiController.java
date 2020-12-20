@@ -35,42 +35,16 @@ public class GithubApiController {
         this.githubIssueService = githubIssueService;
     }
 
-    @PostMapping("/issues/{repoOwner}/{repoName}")
-    public ResponseEntity<String> postIssues(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException {
-        JsonNode responseJson = githubApiService.getIssues(repoOwner, repoName);
-
-        logger.debug("responseJson ========= ");
-        logger.debug(responseJson);
-
-        if(responseJson != null) {
-            responseJson.forEach(entity -> {
-                GithubIssueDTO githubIssueDTO = new GithubIssueDTO();
-                githubIssueDTO.setRepoOwner(repoOwner);
-                githubIssueDTO.setRepoName(repoName);
-                githubIssueDTO.setCreatedAt(entity.get("createdAt"));
-                githubIssueDTO.setClosedAt(entity.get("closedAt"));
-                githubIssueService.save(githubIssueDTO);
-            });
-
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body("Saving issues to database complete");
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Can't find repository");
-    }
 
     @PostMapping("/commits/{repoOwner}/{repoName}")
     public ResponseEntity<String> postCommits(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException {
         Date lastUpdate;
         GithubCommitDTO githubCommitDTO = githubCommitService.getLastCommit(repoOwner, repoName);
-        logger.debug(githubCommitDTO.getRepoName());
         if (null == githubCommitDTO) {
-            logger.debug("Noraaaaaaaaaaaaaaaaaaaaaaaaaa");
             Calendar calendar = Calendar.getInstance();
             calendar.set(1970, Calendar.JANUARY, 1);
             lastUpdate = calendar.getTime();
         } else {
-            logger.debug("Oliviaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
             lastUpdate = githubCommitDTO.getCommittedDate();
         }
 
@@ -99,11 +73,10 @@ public class GithubApiController {
     }
 
     @GetMapping("/issues/{repoOwner}/{repoName}")
-    public ResponseEntity<String> getIssues(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException {
+    public ResponseEntity<String> getIssues(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException, InterruptedException {
         ObjectMapper objectMapper = new ObjectMapper();
-
-        List<GithubIssueDTO> githubIssueDTOs = githubIssueService.getAllIssues(repoOwner, repoName);
-
+        logger.debug("aaaaaa");
+        List<GithubIssueDTO> githubIssueDTOs = githubApiService.getIssuesFromGithub(repoOwner, repoName);
         String githubIssueDTOsJson = objectMapper.writeValueAsString(githubIssueDTOs);
         logger.debug(githubIssueDTOsJson);
 

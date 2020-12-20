@@ -49,7 +49,9 @@ public class GithubIssueDTO {
     }
 
     public void setClosedAt(JsonNode closedAt) {
-        DateTimeFormatter isoParser = ISODateTimeFormat.dateTimeNoMillis();
-        this.closedAt = isoParser.parseDateTime(closedAt.toString().replace("\"", "")).toDate();
+        if(closedAt != null && closedAt.textValue() != null) {
+            DateTimeFormatter isoParser = ISODateTimeFormat.dateTimeNoMillis();
+            this.closedAt = isoParser.parseDateTime(closedAt.toString().replace("\"", "")).toDate();
+        }
     }
 }
