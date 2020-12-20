@@ -10,6 +10,7 @@ import pvs.app.service.ProjectService;
 import pvs.app.service.RepositoryService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -40,9 +41,29 @@ public class ProjectController {
     }
 
     @GetMapping("/project/{memberId}")
-    public ResponseEntity<List<ResponseProjectDTO>> readProject(@PathVariable Long memberId) {
+    public ResponseEntity<List<ResponseProjectDTO>> readMemberAllProjects(@PathVariable Long memberId) {
         List<ResponseProjectDTO> projectList = projectService.getMemberProjects(memberId);
         return ResponseEntity.status(HttpStatus.OK).body(projectList);
+        //-/-/-/-/-/-/-/-/-/-/
+        //    0        0    //
+        //         3        //
+        //////////\\\\\\\\\\\\
+    }
+
+    @GetMapping("/project/{memberId}/{projectId}")
+    public ResponseEntity<ResponseProjectDTO> readSelectedProject
+            (@PathVariable Long memberId, @PathVariable Long projectId) {
+        List<ResponseProjectDTO> projectList = projectService.getMemberProjects(memberId);
+        Optional<ResponseProjectDTO> selectedProject =
+                projectList.stream()
+                           .filter(project -> project.getProjectId().equals(projectId))
+                           .findFirst();
+
+        if(selectedProject.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK).body(selectedProject.get());
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+
         //-/-/-/-/-/-/-/-/-/-/
         //    0        0    //
         //         3        //
