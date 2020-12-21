@@ -27,6 +27,12 @@
         <Logger name="pvs.app.service.GithubIssueLoaderThread" level="debug">
             <AppenderRef ref="Console"/>
         </Logger>
+        <Logger name="pvs.app.service.SonarApiService" level="debug">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="pvs.app.controller.SonarApiController" level="debug">
+            <AppenderRef ref="Console"/>
+        </Logger>
         <Root level="error">
             <AppenderRef ref="Console"/>
         </Root>
