@@ -43,5 +43,3 @@ jobs:
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           # Target url
           target_repo_url: git@ssl-gitlab.csie.ntut.edu.tw:timchang1005/pvs-springboot.git
-          # Username for ssh connection
-          ssh_username: ${{ secrets.SSH_USERNAME }}
