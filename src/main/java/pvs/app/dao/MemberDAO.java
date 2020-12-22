@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface MemberDAO extends CrudRepository<Member, Long> {
-    List<Member> findByAccount(String account);
+    Member findByAccount(String account);
     Member findById(long id);
 }

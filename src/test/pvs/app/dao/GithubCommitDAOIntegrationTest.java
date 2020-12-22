@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import pvs.app.Application;
 import pvs.app.entity.GithubCommit;
@@ -16,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class GithubCommitDAOIntegrationTest {
 
     @Autowired
@@ -25,7 +27,7 @@ public class GithubCommitDAOIntegrationTest {
     private final GithubCommit githubCommit02 = new GithubCommit();
 
     @Before
-    public void init() {
+    public void setup() {
         githubCommit01.setRepoOwner("facebook");
         githubCommit01.setRepoName("react");
         githubCommit01.setAuthorEmail("test");
@@ -33,8 +35,8 @@ public class GithubCommitDAOIntegrationTest {
         githubCommit01.setCommittedDate(new Date());
         githubCommitDAO.save(githubCommit01);
 
-        githubCommit02.setRepoOwner("facebook");
-        githubCommit02.setRepoName("react");
+        githubCommit02.setRepoOwner("angular");
+        githubCommit02.setRepoName("angular");
         githubCommit02.setAuthorEmail("test");
         githubCommit02.setAuthorName("test");
         githubCommit02.setCommittedDate(new Date());
@@ -52,9 +54,8 @@ public class GithubCommitDAOIntegrationTest {
     @Test
     public void whenFindFirstByRepoOwnerAndRepoNameOrderByCommittedDateDesc_thenReturnGithubCommit() {
         GithubCommit foundEntity =
-                githubCommitDAO.findFirstByRepoOwnerAndRepoNameOrderByCommittedDateDesc("facebook", "react");
+                githubCommitDAO.findFirstByRepoOwnerAndRepoNameOrderByCommittedDateDesc("angular", "angular");
 
         assertEquals(githubCommit02.getCommittedDate(), foundEntity.getCommittedDate());
     }
-
 }

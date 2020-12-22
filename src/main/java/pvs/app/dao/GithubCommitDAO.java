@@ -11,5 +11,4 @@ import java.util.List;
 public interface GithubCommitDAO extends CrudRepository<GithubCommit, Long> {
     List<GithubCommit> findByRepoOwnerAndRepoName(String repoOwner, String repoName);
     GithubCommit findFirstByRepoOwnerAndRepoNameOrderByCommittedDateDesc(String repoOwner, String repoName);
-    GithubCommit findByRepoOwnerAndRepoNameAndCommittedDate(String repoOwner, String repoName, Date committedDate);
 }
