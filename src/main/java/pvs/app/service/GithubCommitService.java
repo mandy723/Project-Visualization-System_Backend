@@ -54,11 +54,4 @@ public class GithubCommitService {
         dto.setCommittedDate(githubCommit.getCommittedDate());
         return dto;
     }
-
-    public GithubCommitDTO getCommit(String repoOwner, String repoName, Date committedDate) {
-        GithubCommit githubCommit = githubCommitDAO.findByRepoOwnerAndRepoNameAndCommittedDate(repoOwner, repoName, committedDate);
-        GithubCommitDTO githubCommitDTO = modelMapper.map(githubCommit, GithubCommitDTO.class);
-        return githubCommit != null ? githubCommitDTO: null;
-    }
-
 }

@@ -3,11 +3,13 @@ package pvs.app.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Data
 @Entity
 public class Member {
     @Id
+    @NotNull
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
