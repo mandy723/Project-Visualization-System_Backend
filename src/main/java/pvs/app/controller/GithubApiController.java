@@ -1,6 +1,5 @@
 package pvs.app.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,7 +11,6 @@ import pvs.app.dto.GithubCommitDTO;
 import pvs.app.dto.GithubIssueDTO;
 import pvs.app.service.GithubCommitService;
 import pvs.app.service.GithubApiService;
-import pvs.app.service.GithubIssueService;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -27,12 +25,10 @@ public class GithubApiController {
 
     private final GithubApiService githubApiService;
     private final GithubCommitService githubCommitService;
-    private final GithubIssueService githubIssueService;
 
-    public GithubApiController(GithubApiService githubApiService, GithubCommitService githubCommitService, GithubIssueService githubIssueService) {
+    public GithubApiController(GithubApiService githubApiService, GithubCommitService githubCommitService) {
         this.githubApiService = githubApiService;
         this.githubCommitService = githubCommitService;
-        this.githubIssueService = githubIssueService;
     }
 
 
