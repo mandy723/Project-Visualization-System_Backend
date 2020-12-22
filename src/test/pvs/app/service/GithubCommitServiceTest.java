@@ -31,6 +31,10 @@ public class GithubCommitServiceTest {
     private GithubCommitDAO githubCommitDAO;
 
     private List<GithubCommit> mockGithubCommits;
+    private final GithubCommit githubCommit01 = new GithubCommit();
+    private final GithubCommit githubCommit02 = new GithubCommit();
+    private final GithubCommitDTO githubCommitDTO01 = new GithubCommitDTO();
+
 
     @Before
     public void init() throws ParseException {
@@ -38,12 +42,14 @@ public class GithubCommitServiceTest {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // 日期格式
 
-        GithubCommit githubCommit01 = new GithubCommit();
         githubCommit01.setRepoOwner("facebook");
         githubCommit01.setRepoName("react");
         githubCommit01.setCommittedDate(dateFormat.parse("2020-12-29 11:11:11"));
 
-        GithubCommit githubCommit02 = new GithubCommit();
+        githubCommitDTO01.setRepoName("facebook");
+        githubCommitDTO01.setRepoName("react");
+        githubCommitDTO01.setCommittedDate(dateFormat.parse("2020-12-29 11:11:11"));
+
         githubCommit02.setRepoOwner("facebook");
         githubCommit02.setRepoName("react");
         githubCommit02.setCommittedDate(dateFormat.parse("2020-12-30 11:11:11"));
@@ -73,6 +79,4 @@ public class GithubCommitServiceTest {
 
         assertEquals(dateFormat.parse("2020-12-30 11:11:11"), githubCommit.getCommittedDate());
     }
-
-
 }
