@@ -6,31 +6,31 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Logger name="pvs.app.controller.GithubApiController" level="debug">
+        <Logger name="pvs.app.controller.GithubApiController" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
-        <Logger name="pvs.app.service.ProjectService" level="debug">
+        <Logger name="pvs.app.service.ProjectService" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
-        <Logger name="pvs.app.service.GithubApiService" level="debug">
+        <Logger name="pvs.app.service.GithubApiService" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
-        <Logger name="pvs.app.service.RepositoryService" level="debug">
+        <Logger name="pvs.app.service.RepositoryService" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
-        <Logger name="pvs.app.service.GithubCommitService" level="debug">
+        <Logger name="pvs.app.service.GithubCommitService" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
-        <Logger name="pvs.app.dto.GithubCommitDTO" level="debug">
+        <Logger name="pvs.app.dto.GithubCommitDTO" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
-        <Logger name="pvs.app.service.GithubIssueLoaderThread" level="debug">
+        <Logger name="pvs.app.service.GithubIssueLoaderThread" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
-        <Logger name="pvs.app.service.SonarApiService" level="debug">
+        <Logger name="pvs.app.service.SonarApiService" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
-        <Logger name="pvs.app.controller.SonarApiController" level="debug">
+        <Logger name="pvs.app.controller.SonarApiController" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
         <Root level="error">
