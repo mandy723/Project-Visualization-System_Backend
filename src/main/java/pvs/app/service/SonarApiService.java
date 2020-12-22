@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import pvs.app.dto.CodeCoverageDTO;
 
 import java.io.IOException;
 import java.util.*;
@@ -25,9 +28,9 @@ public class SonarApiService {
                 .build();
     }
 
-    public double getSonarCodeCoverage(String component) throws IOException {
+    public List<CodeCoverageDTO> getSonarCodeCoverage(String component) throws IOException {
         String responseJson = this.webClient.get()
-                .uri("/measures/component?component=" +component + "&metricKeys=coverage")
+                .uri("/measures/search_history?component=" +component + "&metrics=coverage")
                 .exchange()
                 .block()
                 .bodyToMono(String.class)
@@ -35,11 +38,26 @@ public class SonarApiService {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        Optional<JsonNode> coverageJson = Optional.ofNullable(mapper.readTree(responseJson))
-                .map(resp -> resp.get("component"))
-                .map(comp -> comp.get("measures"));
+        Optional<JsonNode> coverageJsonNodes = Optional.ofNullable(mapper.readTree(responseJson))
+                .map(resp -> resp.get("measures"));
 
-        double coverage = coverageJson.get().get(0).get("value").asDouble();
-        return coverage;
+        JsonNode coverageArrayNode = coverageJsonNodes.get().get(0).get("history");
+
+        List<CodeCoverageDTO> coverages = new ArrayList<>();
+
+        if(coverageArrayNode.isArray()) {
+            for(final JsonNode jsonNode : coverageArrayNode) {
+                DateTimeFormatter isoParser = ISODateTimeFormat.dateTimeNoMillis().withLocale(Locale.TAIWAN);
+
+                logger.debug(jsonNode);
+
+                Date date =
+                        isoParser.parseDateTime(jsonNode.get("date").textValue().replace("\"", ""))
+                                 .toDate();
+                coverages.add(new CodeCoverageDTO(date, jsonNode.get("value").asDouble()));
+            }
+        }
+
+        return coverages;
     }
 }

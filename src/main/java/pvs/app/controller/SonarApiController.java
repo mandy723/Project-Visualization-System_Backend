@@ -10,9 +10,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pvs.app.dto.CodeCoverageDTO;
 import pvs.app.service.SonarApiService;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -26,12 +30,14 @@ public class SonarApiController {
     }
 
     @GetMapping("/sonar/{component}/coverage")
-    public ResponseEntity<Double> getCoverage(@PathVariable("component") String component) throws IOException, InterruptedException {
+    public ResponseEntity<String> getCoverage(@PathVariable("component") String component) throws IOException, InterruptedException {
         ObjectMapper objectMapper = new ObjectMapper();
         logger.debug("coverage");
-        Double coverage = sonarApiService.getSonarCodeCoverage(component);
+        List<CodeCoverageDTO> coverages = sonarApiService.getSonarCodeCoverage(component);
+
+        String coverageString = objectMapper.writeValueAsString(coverages);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(coverage);
+                .body(coverageString);
     }
 }

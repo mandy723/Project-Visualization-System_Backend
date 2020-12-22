@@ -48,8 +48,6 @@ public class GithubApiController {
             lastUpdate = githubCommitDTO.getCommittedDate();
         }
 
-        logger.debug(lastUpdate);
-
         try {
             githubApiService.getCommitsFromGithub(repoOwner, repoName, lastUpdate);
             return ResponseEntity.status(HttpStatus.OK).body("");
@@ -66,7 +64,6 @@ public class GithubApiController {
         List<GithubCommitDTO> githubCommitDTOs = githubCommitService.getAllCommits(repoOwner, repoName);
 
         String githubCommitDTOsJson = objectMapper.writeValueAsString(githubCommitDTOs);
-        logger.debug(githubCommitDTOsJson);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(githubCommitDTOsJson);
@@ -75,10 +72,9 @@ public class GithubApiController {
     @GetMapping("/issues/{repoOwner}/{repoName}")
     public ResponseEntity<String> getIssues(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException, InterruptedException {
         ObjectMapper objectMapper = new ObjectMapper();
-        logger.debug("aaaaaa");
+
         List<GithubIssueDTO> githubIssueDTOs = githubApiService.getIssuesFromGithub(repoOwner, repoName);
         String githubIssueDTOsJson = objectMapper.writeValueAsString(githubIssueDTOs);
-        logger.debug(githubIssueDTOsJson);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(githubIssueDTOsJson);
