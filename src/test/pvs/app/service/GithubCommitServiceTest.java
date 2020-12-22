@@ -18,7 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
@@ -60,23 +60,31 @@ public class GithubCommitServiceTest {
 
     @Test
     public void get_all_commits() {
+        //when
         when(githubCommitDAO.findByRepoOwnerAndRepoName("facebook", "react"))
                 .thenReturn(mockGithubCommits);
 
         List<GithubCommitDTO> githubCommits = githubCommitService.getAllCommits("facebook", "react");
 
+        //expect
         assertEquals(2, githubCommits.size());
+        verify(githubCommitDAO, times(1)).findByRepoOwnerAndRepoName("facebook", "react");
     }
 
     @Test
     public void get_last_commit() throws ParseException {
+        //given
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // 日期格式
 
+        //when
         when(githubCommitDAO.findFirstByRepoOwnerAndRepoNameOrderByCommittedDateDesc("facebook", "react"))
                 .thenReturn(mockGithubCommits.get(1));
 
         GithubCommitDTO githubCommit = githubCommitService.getLastCommit("facebook", "react");
 
+        //expect
         assertEquals(dateFormat.parse("2020-12-30 11:11:11"), githubCommit.getCommittedDate());
+        verify(githubCommitDAO, times(1)).findFirstByRepoOwnerAndRepoNameOrderByCommittedDateDesc("facebook", "react");
+
     }
 }

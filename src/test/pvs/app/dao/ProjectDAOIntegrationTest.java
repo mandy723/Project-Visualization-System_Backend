@@ -1,10 +1,9 @@
 package pvs.app.dao;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -13,13 +12,11 @@ import pvs.app.Application;
 import pvs.app.entity.Project;
 import pvs.app.entity.Repository;
 
-import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
@@ -37,6 +34,8 @@ public class ProjectDAOIntegrationTest {
 
     @Before
     public void setup() {
+        MockitoAnnotations.initMocks(this);
+
         project01 = new Project();
         project01.setMemberId(1L);
         project01.setName("react");
@@ -67,6 +66,5 @@ public class ProjectDAOIntegrationTest {
         List<Project> foundEntityList = projectDAO.findAll();
         assertEquals(2, foundEntityList.size());
         assertEquals(2, foundEntityList.get(0).getRepositorySet().size());
-        assertTrue(true);
     }
 }

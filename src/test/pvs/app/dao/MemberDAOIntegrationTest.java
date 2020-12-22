@@ -1,7 +1,6 @@
 package pvs.app.dao;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,11 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import pvs.app.Application;
-import pvs.app.entity.GithubCommit;
 import pvs.app.entity.Member;
 
-import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
