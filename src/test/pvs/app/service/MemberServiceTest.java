@@ -12,6 +12,7 @@ import pvs.app.dto.MemberDTO;
 import pvs.app.entity.Member;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
@@ -21,27 +22,31 @@ public class MemberServiceTest {
     private MemberService memberService;
 
     @MockBean
-    private MemberDAO memberDAO;
+    private MemberDAO mockMemberDAO;
 
-    private final Member mockMember01 = new Member();
+    private final Member member01 = new Member();
     private final MemberDTO member01DTO = new MemberDTO();
 
     @Test
     public void get() {
+        //context
+        when(mockMemberDAO.findById(1L))
+                .thenReturn(member01);
+
         //given
-        mockMember01.setId(1L);
-        mockMember01.setAccount("aaaa");
-        mockMember01.setPassword("1234");
+        member01.setId(1L);
+        member01.setAccount("aaaa");
+        member01.setPassword("1234");
 
         member01DTO.setId(1L);
         member01DTO.setAccount("aaaa");
         member01DTO.setPassword("1234");
         //when
-        when(memberDAO.findById(1L))
-                .thenReturn(mockMember01);
-        //expect
-        assertEquals(member01DTO.toString(), memberService.get(1L).toString());
-        verify(memberDAO, times(1)).findById(1L);
+        MemberDTO memberDTO = memberService.get(1L);
+
+        //then
+        assertEquals(member01DTO.toString(), memberDTO.toString());
+        verify(mockMemberDAO, times(1)).findById(1L);
     }
 
 }
