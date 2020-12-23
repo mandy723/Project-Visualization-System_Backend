@@ -41,6 +41,7 @@ public class MemberServiceTest {
         member01DTO.setId(1L);
         member01DTO.setAccount("aaaa");
         member01DTO.setPassword("1234");
+
         //when
         MemberDTO memberDTO = memberService.get(1L);
 

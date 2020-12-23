@@ -5,7 +5,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import pvs.app.service.GithubApiService;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

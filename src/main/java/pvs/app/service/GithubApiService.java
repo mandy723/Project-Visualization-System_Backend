@@ -2,7 +2,6 @@ package pvs.app.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -253,7 +252,6 @@ class GithubCommitLoaderThread extends Thread {
         this.webClient = webClient;
     }
 
-    @SneakyThrows
     public void run() {
         logger.debug(i++);
         //todo get data since last commit date to now
@@ -288,13 +286,18 @@ class GithubCommitLoaderThread extends Thread {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        Optional<JsonNode> commits = Optional.ofNullable(mapper.readTree(responseJson))
-                .map(resp -> resp.get("data"))
-                .map(data -> data.get("repository"))
-                .map(repo -> repo.get("defaultBranchRef"))
-                .map(branch -> branch.get("target"))
-                .map(tag -> tag.get("history"))
-                .map(hist -> hist.get("nodes"));
+        Optional<JsonNode> commits = null;
+        try {
+            commits = Optional.ofNullable(mapper.readTree(responseJson))
+                    .map(resp -> resp.get("data"))
+                    .map(data -> data.get("repository"))
+                    .map(repo -> repo.get("defaultBranchRef"))
+                    .map(branch -> branch.get("target"))
+                    .map(tag -> tag.get("history"))
+                    .map(hist -> hist.get("nodes"));
+        } catch (IOException e) {
+            Thread.currentThread().interrupt();
+        }
 
         commits.get().forEach(entity->{
             GithubCommitDTO githubCommitDTO = new GithubCommitDTO();
@@ -336,7 +339,6 @@ class GithubIssueLoaderThread extends Thread {
         this.page = page;
     }
 
-    @SneakyThrows
     public void run() {
         String responseJson = this.webClient.get()
                 .uri("/"+ this.repoOwner +"/"+ this.repoName +"/issues?page="+ this.page +"&per_page=100&state=all")
@@ -346,7 +348,12 @@ class GithubIssueLoaderThread extends Thread {
                 .block();
         ObjectMapper mapper = new ObjectMapper();
 
-        Optional<JsonNode> issueList = Optional.ofNullable(mapper.readTree(responseJson));
+        Optional<JsonNode> issueList = null;
+        try {
+            issueList = Optional.ofNullable(mapper.readTree(responseJson));
+        } catch (IOException e) {
+            Thread.currentThread().interrupt();
+        }
 
 
         issueList.get().forEach(entity->{

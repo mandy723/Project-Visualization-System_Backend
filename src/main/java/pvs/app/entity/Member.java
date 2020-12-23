@@ -1,11 +1,8 @@
 package pvs.app.entity;
 
-import lombok.Data;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-@Data
 @Entity
 public class Member {
     @Id
@@ -31,5 +28,29 @@ public class Member {
                 ", account='" + account + '\'' +
                 ", password='" + password + '\'' +
                 '}';
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

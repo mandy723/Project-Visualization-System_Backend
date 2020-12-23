@@ -1,6 +1,0 @@
-pvs\app\service\MemberServiceTest.class
-pvs\app\dao\GithubCommitDAOIntegrationTest.class
-pvs\app\service\GithubCommitServiceTest.class
-pvs\app\dao\MemberDAOIntegrationTest.class
-pvs\app\dao\ProjectDAOIntegrationTest.class
-pvs\app\service\ProjectServiceTest.class
