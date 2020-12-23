@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GithubCommitService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">springboot_pvs_app</a> &gt; <a href="index.source.html" class="el_package">pvs.app.service</a> &gt; <span class="el_source">GithubCommitService.java</span></div><h1>GithubCommitService.java</h1><pre class="source lang-java linenums">package pvs.app.service;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
+import pvs.app.controller.GithubApiController;
+import pvs.app.entity.GithubCommit;
+import pvs.app.dto.GithubCommitDTO;
+import pvs.app.dao.GithubCommitDAO;
+
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+@Service
+public class GithubCommitService {
+
+<span class="fc" id="L19">    static final Logger logger = LogManager.getLogger(GithubCommitService.class.getName());</span>
+
+
+    private final GithubCommitDAO githubCommitDAO;
+    private final ModelMapper modelMapper;
+
+<span class="fc" id="L25">    GithubCommitService(GithubCommitDAO githubCommitDAO, ModelMapper modelMapper) {</span>
+<span class="fc" id="L26">        this.githubCommitDAO = githubCommitDAO;</span>
+<span class="fc" id="L27">        this.modelMapper = modelMapper;</span>
+<span class="fc" id="L28">    }</span>
+
+    public void save(GithubCommitDTO githubCommitDTO) {
+<span class="fc" id="L31">        GithubCommit githubCommit = modelMapper.map(githubCommitDTO, GithubCommit.class);</span>
+<span class="fc" id="L32">        githubCommitDAO.save(githubCommit);</span>
+<span class="fc" id="L33">    }</span>
+
+    public List&lt;GithubCommitDTO&gt; getAllCommits(String repoOwner, String repoName) {
+<span class="fc" id="L36">        List&lt;GithubCommit&gt; entities = githubCommitDAO.findByRepoOwnerAndRepoName(repoOwner, repoName);</span>
+<span class="fc" id="L37">        List&lt;GithubCommitDTO&gt; githubCommitDTOs = new LinkedList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        for (GithubCommit githubCommit : entities) {</span>
+<span class="fc" id="L40">            GithubCommitDTO dto = modelMapper.map(githubCommit, GithubCommitDTO.class);</span>
+<span class="fc" id="L41">            dto.setCommittedDate(githubCommit.getCommittedDate());</span>
+<span class="fc" id="L42">            githubCommitDTOs.add(dto);</span>
+<span class="fc" id="L43">        }</span>
+<span class="fc" id="L44">        return githubCommitDTOs;</span>
+    }
+
+    public GithubCommitDTO getLastCommit(String repoOwner, String repoName) {
+<span class="fc" id="L48">        GithubCommit githubCommit = githubCommitDAO.findFirstByRepoOwnerAndRepoNameOrderByCommittedDateDesc(repoOwner, repoName);</span>
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">        if(null == githubCommit) {</span>
+<span class="nc" id="L50">            logger.debug(&quot;NONONONONONONONONONONOONONONONO&quot;);</span>
+<span class="nc" id="L51">            return null;</span>
+        }
+<span class="fc" id="L53">        GithubCommitDTO dto = modelMapper.map(githubCommit, GithubCommitDTO.class);</span>
+<span class="fc" id="L54">        dto.setCommittedDate(githubCommit.getCommittedDate());</span>
+<span class="fc" id="L55">        return dto;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

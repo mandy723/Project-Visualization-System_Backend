@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GithubCommitDTO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">springboot_pvs_app</a> &gt; <a href="index.source.html" class="el_package">pvs.app.dto</a> &gt; <span class="el_source">GithubCommitDTO.java</span></div><h1>GithubCommitDTO.java</h1><pre class="source lang-java linenums">package pvs.app.dto;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
+import pvs.app.service.GithubApiService;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Optional;
+import java.util.TimeZone;
+
+<span class="fc" id="L17">public class GithubCommitDTO {</span>
+
+<span class="fc" id="L19">    static final Logger logger = LogManager.getLogger(GithubCommitDTO.class.getName());</span>
+
+
+    private String repoOwner;
+    private String repoName;
+    private Date committedDate;
+    private int additions;
+    private int deletions;
+    private int changeFiles;
+    private String authorName;
+    private String authorEmail;
+
+    public String getRepoOwner() {
+<span class="fc" id="L32">        return repoOwner;</span>
+    }
+
+    public void setRepoOwner(String repoOwner) {
+<span class="fc" id="L36">        this.repoOwner = repoOwner;</span>
+<span class="fc" id="L37">    }</span>
+
+    public String getRepoName() {
+<span class="fc" id="L40">        return repoName;</span>
+    }
+
+    public void setRepoName(String repoName) {
+<span class="fc" id="L44">        this.repoName = repoName;</span>
+<span class="fc" id="L45">    }</span>
+
+    public Date getCommittedDate() {
+<span class="fc" id="L48">        logger.debug(committedDate);</span>
+<span class="fc" id="L49">        return committedDate;</span>
+    }
+
+    public void setCommittedDate(Date committedDate) {
+<span class="fc" id="L53">        this.committedDate = committedDate;</span>
+<span class="fc" id="L54">    }</span>
+
+    public int getAdditions() {
+<span class="fc" id="L57">        return additions;</span>
+    }
+
+    public void setAdditions(int additions) {
+<span class="fc" id="L61">        this.additions = additions;</span>
+<span class="fc" id="L62">    }</span>
+
+    public int getDeletions() {
+<span class="fc" id="L65">        return deletions;</span>
+    }
+
+    public void setDeletions(int deletions) {
+<span class="fc" id="L69">        this.deletions = deletions;</span>
+<span class="fc" id="L70">    }</span>
+
+    public String getAuthorName() {
+<span class="fc" id="L73">        return authorName;</span>
+    }
+
+    public void setAuthorName(String authorName) {
+<span class="fc" id="L77">        this.authorName = authorName;</span>
+<span class="fc" id="L78">    }</span>
+
+    public String getAuthorEmail() {
+<span class="fc" id="L81">        return authorEmail;</span>
+    }
+
+    public void setAuthorEmail(String authorEmail) {
+<span class="fc" id="L85">        this.authorEmail = authorEmail;</span>
+<span class="fc" id="L86">    }</span>
+
+    public void setAuthor(Optional&lt;JsonNode&gt; authorJson) {
+<span class="nc" id="L89">        authorJson.map(s -&gt; s.get(&quot;name&quot;)).ifPresent(s -&gt; this.authorName = s.toString());</span>
+<span class="nc" id="L90">        authorJson.map(s -&gt; s.get(&quot;email&quot;)).ifPresent(s -&gt; this.authorEmail = s.toString());</span>
+<span class="nc" id="L91">    }</span>
+
+    public void setCommittedDate(JsonNode committedDate) {
+
+<span class="nc" id="L95">        DateTimeFormatter isoParser = ISODateTimeFormat.dateTimeNoMillis();</span>
+<span class="nc" id="L96">        this.committedDate =</span>
+<span class="nc" id="L97">                isoParser.parseDateTime(committedDate.toString().replace(&quot;\&quot;&quot;, &quot;&quot;)).toDate();</span>
+<span class="nc" id="L98">    }</span>
+
+    public String getAddSecondsToCommittedDateISOString(int seconds) {
+<span class="nc" id="L101">        Calendar calendar = Calendar.getInstance();</span>
+<span class="nc" id="L102">        calendar.setTime(this.committedDate);</span>
+<span class="nc" id="L103">        calendar.add(Calendar.SECOND, seconds);</span>
+<span class="nc" id="L104">        TimeZone tz = TimeZone.getDefault();</span>
+<span class="nc" id="L105">        DateFormat df = new SimpleDateFormat(&quot;yyyy-MM-dd'T'HH:mm'Z'&quot;);</span>
+<span class="nc" id="L106">        df.setTimeZone(tz);</span>
+<span class="nc" id="L107">        return df.format(calendar.getTime());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

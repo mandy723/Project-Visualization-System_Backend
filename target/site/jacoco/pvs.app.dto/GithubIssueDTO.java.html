@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GithubIssueDTO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">springboot_pvs_app</a> &gt; <a href="index.source.html" class="el_package">pvs.app.dto</a> &gt; <span class="el_source">GithubIssueDTO.java</span></div><h1>GithubIssueDTO.java</h1><pre class="source lang-java linenums">package pvs.app.dto;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import org.joda.time.format.ISODateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import java.util.Date;
+
+<span class="nc" id="L8">public class GithubIssueDTO {</span>
+    private String repoOwner;
+    private String repoName;
+    private Date createdAt;
+    private Date closedAt;
+
+    public String getRepoOwner() {
+<span class="nc" id="L15">        return repoOwner;</span>
+    }
+
+    public void setRepoOwner(String repoOwner) {
+<span class="nc" id="L19">        this.repoOwner = repoOwner;</span>
+<span class="nc" id="L20">    }</span>
+
+    public String getRepoName() {
+<span class="nc" id="L23">        return repoName;</span>
+    }
+
+    public void setRepoName(String repoName) {
+<span class="nc" id="L27">        this.repoName = repoName;</span>
+<span class="nc" id="L28">    }</span>
+
+    public Date getCreatedAt() {
+<span class="nc" id="L31">        return createdAt;</span>
+    }
+
+    public void setCreatedAt(Date createdAt) {
+<span class="nc" id="L35">        this.createdAt = createdAt;</span>
+<span class="nc" id="L36">    }</span>
+
+    public void setCreatedAt(JsonNode createdAt) {
+<span class="nc" id="L39">        DateTimeFormatter isoParser = ISODateTimeFormat.dateTimeNoMillis();</span>
+<span class="nc" id="L40">        this.createdAt = isoParser.parseDateTime(createdAt.toString().replace(&quot;\&quot;&quot;, &quot;&quot;)).toDate();</span>
+<span class="nc" id="L41">    }</span>
+
+    public Date getClosedAt() {
+<span class="nc" id="L44">        return closedAt;</span>
+    }
+
+    public void setClosedAt(Date closedAt) {
+<span class="nc" id="L48">        this.closedAt = closedAt;</span>
+<span class="nc" id="L49">    }</span>
+
+    public void setClosedAt(JsonNode closedAt) {
+<span class="nc bnc" id="L52" title="All 4 branches missed.">        if(closedAt != null &amp;&amp; closedAt.textValue() != null) {</span>
+<span class="nc" id="L53">            DateTimeFormatter isoParser = ISODateTimeFormat.dateTimeNoMillis();</span>
+<span class="nc" id="L54">            this.closedAt = isoParser.parseDateTime(closedAt.toString().replace(&quot;\&quot;&quot;, &quot;&quot;)).toDate();</span>
+        }
+<span class="nc" id="L56">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

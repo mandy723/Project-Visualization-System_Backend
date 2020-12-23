@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GithubApiController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">springboot_pvs_app</a> &gt; <a href="index.source.html" class="el_package">pvs.app.controller</a> &gt; <span class="el_source">GithubApiController.java</span></div><h1>GithubApiController.java</h1><pre class="source lang-java linenums">package pvs.app.controller;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import pvs.app.dto.GithubCommitDTO;
+import pvs.app.dto.GithubIssueDTO;
+import pvs.app.service.GithubCommitService;
+import pvs.app.service.GithubApiService;
+
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+@RestController
+@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+public class GithubApiController {
+
+<span class="fc" id="L24">    static final Logger logger = LogManager.getLogger(GithubApiController.class.getName());</span>
+
+    private final GithubApiService githubApiService;
+    private final GithubCommitService githubCommitService;
+
+<span class="fc" id="L29">    public GithubApiController(GithubApiService githubApiService, GithubCommitService githubCommitService) {</span>
+<span class="fc" id="L30">        this.githubApiService = githubApiService;</span>
+<span class="fc" id="L31">        this.githubCommitService = githubCommitService;</span>
+<span class="fc" id="L32">    }</span>
+
+
+    @PostMapping(&quot;/commits/{repoOwner}/{repoName}&quot;)
+    public ResponseEntity&lt;String&gt; postCommits(@PathVariable(&quot;repoOwner&quot;) String repoOwner, @PathVariable(&quot;repoName&quot;) String repoName) throws IOException {
+        Date lastUpdate;
+<span class="nc" id="L38">        GithubCommitDTO githubCommitDTO = githubCommitService.getLastCommit(repoOwner, repoName);</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">        if (null == githubCommitDTO) {</span>
+<span class="nc" id="L40">            Calendar calendar = Calendar.getInstance();</span>
+<span class="nc" id="L41">            calendar.set(1970, Calendar.JANUARY, 1);</span>
+<span class="nc" id="L42">            lastUpdate = calendar.getTime();</span>
+<span class="nc" id="L43">        } else {</span>
+<span class="nc" id="L44">            lastUpdate = githubCommitDTO.getCommittedDate();</span>
+        }
+
+        try {
+<span class="nc" id="L48">            githubApiService.getCommitsFromGithub(repoOwner, repoName, lastUpdate);</span>
+<span class="nc" id="L49">            return ResponseEntity.status(HttpStatus.OK).body(&quot;&quot;);</span>
+<span class="nc" id="L50">        } catch (InterruptedException e) {</span>
+<span class="nc" id="L51">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(&quot;&quot;);</span>
+        }
+    }
+
+    @GetMapping(&quot;/commits/{repoOwner}/{repoName}&quot;)
+    public ResponseEntity&lt;String&gt; getCommits(@PathVariable(&quot;repoOwner&quot;) String repoOwner, @PathVariable(&quot;repoName&quot;) String repoName) throws IOException {
+
+<span class="nc" id="L58">        ObjectMapper objectMapper = new ObjectMapper();</span>
+
+<span class="nc" id="L60">        List&lt;GithubCommitDTO&gt; githubCommitDTOs = githubCommitService.getAllCommits(repoOwner, repoName);</span>
+
+<span class="nc" id="L62">        String githubCommitDTOsJson = objectMapper.writeValueAsString(githubCommitDTOs);</span>
+
+<span class="nc" id="L64">        return ResponseEntity.status(HttpStatus.OK)</span>
+<span class="nc" id="L65">                .body(githubCommitDTOsJson);</span>
+    }
+
+    @GetMapping(&quot;/issues/{repoOwner}/{repoName}&quot;)
+    public ResponseEntity&lt;String&gt; getIssues(@PathVariable(&quot;repoOwner&quot;) String repoOwner, @PathVariable(&quot;repoName&quot;) String repoName) throws IOException, InterruptedException {
+<span class="nc" id="L70">        ObjectMapper objectMapper = new ObjectMapper();</span>
+
+<span class="nc" id="L72">        List&lt;GithubIssueDTO&gt; githubIssueDTOs = githubApiService.getIssuesFromGithub(repoOwner, repoName);</span>
+<span class="nc" id="L73">        String githubIssueDTOsJson = objectMapper.writeValueAsString(githubIssueDTOs);</span>
+
+<span class="nc" id="L75">        return ResponseEntity.status(HttpStatus.OK)</span>
+<span class="nc" id="L76">                .body(githubIssueDTOsJson);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

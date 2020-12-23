@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProjectController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">springboot_pvs_app</a> &gt; <a href="index.source.html" class="el_package">pvs.app.controller</a> &gt; <span class="el_source">ProjectController.java</span></div><h1>ProjectController.java</h1><pre class="source lang-java linenums">package pvs.app.controller;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import pvs.app.dto.CreateProjectDTO;
+import pvs.app.dto.ResponseProjectDTO;
+import pvs.app.service.ProjectService;
+import pvs.app.service.RepositoryService;
+
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+public class ProjectController {
+    private final ProjectService projectService;
+    private final RepositoryService repositoryService;
+
+<span class="fc" id="L21">    public ProjectController(ProjectService projectService, RepositoryService repositoryService){</span>
+<span class="fc" id="L22">        this.projectService = projectService;</span>
+<span class="fc" id="L23">        this.repositoryService = repositoryService;</span>
+<span class="fc" id="L24">    }</span>
+
+    @PostMapping(&quot;/project&quot;)
+    public ResponseEntity&lt;String&gt; createProject(@RequestBody CreateProjectDTO projectDTO) {
+        //我在檢查
+        try{
+<span class="nc bnc" id="L30" title="All 2 branches missed.">            if(repositoryService.checkURL(projectDTO.getRepositoryURL())) {</span>
+<span class="nc" id="L31">                projectService.create(projectDTO);</span>
+
+<span class="nc" id="L33">                return ResponseEntity.status(HttpStatus.OK).body(&quot;你成功了&quot;);</span>
+            }
+            else {
+<span class="nc" id="L36">                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(&quot;你連URL都不會打嗎&quot;);</span>
+            }
+<span class="nc" id="L38">        }catch(Exception e){</span>
+<span class="nc" id="L39">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(&quot;你去死吧&quot;);</span>
+        }
+    }
+
+    @GetMapping(&quot;/project/{memberId}&quot;)
+    public ResponseEntity&lt;List&lt;ResponseProjectDTO&gt;&gt; readMemberAllProjects(@PathVariable Long memberId) {
+<span class="nc" id="L45">        List&lt;ResponseProjectDTO&gt; projectList = projectService.getMemberProjects(memberId);</span>
+<span class="nc" id="L46">        return ResponseEntity.status(HttpStatus.OK).body(projectList);</span>
+        //-/-/-/-/-/-/-/-/-/-/
+        //    0        0    //
+        //         3        //
+        //////////\\\\\\\\\\\\
+    }
+
+    @GetMapping(&quot;/project/{memberId}/{projectId}&quot;)
+    public ResponseEntity&lt;ResponseProjectDTO&gt; readSelectedProject
+            (@PathVariable Long memberId, @PathVariable Long projectId) {
+<span class="nc" id="L56">        List&lt;ResponseProjectDTO&gt; projectList = projectService.getMemberProjects(memberId);</span>
+<span class="nc" id="L57">        Optional&lt;ResponseProjectDTO&gt; selectedProject =</span>
+<span class="nc" id="L58">                projectList.stream()</span>
+<span class="nc" id="L59">                           .filter(project -&gt; project.getProjectId().equals(projectId))</span>
+<span class="nc" id="L60">                           .findFirst();</span>
+
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if(selectedProject.isPresent()) {</span>
+<span class="nc" id="L63">            return ResponseEntity.status(HttpStatus.OK).body(selectedProject.get());</span>
+        }
+<span class="nc" id="L65">        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);</span>
+
+        //-/-/-/-/-/-/-/-/-/-/
+        //    0        0    //
+        //         3        //
+        //////////\\\\\\\\\\\\
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

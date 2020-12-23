@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">springboot_pvs_app</a> &gt; <a href="index.source.html" class="el_package">pvs.app.config</a> &gt; <span class="el_source">SecurityConfig.java</span></div><h1>SecurityConfig.java</h1><pre class="source lang-java linenums">package pvs.app.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.web.cors.CorsConfiguration;
+
+@Configuration
+@EnableWebSecurity
+<span class="fc" id="L11">public class SecurityConfig extends WebSecurityConfigurerAdapter {</span>
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+<span class="pc" id="L15">        http.cors().configurationSource(request -&gt; new CorsConfiguration().applyPermitDefaultValues())</span>
+<span class="fc" id="L16">                .and().authorizeRequests()</span>
+<span class="fc" id="L17">                .anyRequest().permitAll()</span>
+<span class="fc" id="L18">                .and().csrf().disable();</span>
+<span class="fc" id="L19">    }</span>
+
+//    @Bean
+//    PasswordEncoder passwordEncoder() {
+//        return NoOpPasswordEncoder.getInstance();
+//    }
+//
+//    @Override
+//    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.inMemoryAuthentication()
+//                .withUser(&quot;admin&quot;).password(&quot;123&quot;).roles(&quot;ADMIN&quot;)
+//                .and()
+//                .withUser(&quot;user&quot;).password(&quot;123&quot;).roles(&quot;USER&quot;);
+//    }
+
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+//        http.exceptionHandling()
+//                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
+//                .accessDeniedHandler(new AccessDeniedHandlerImpl())
+//                .and()
+//                .addFilterAt(loginAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .authorizeRequests()
+//                .antMatchers(&quot;/admin/**&quot;).hasRole(&quot;ADMIN&quot;)
+////                .antMatchers(&quot;/**&quot;).hasRole(&quot;USER&quot;)
+//                .and()
+//                .logout()
+//                .logoutUrl(&quot;/logout&quot;)
+//                .invalidateHttpSession(true)
+//                .logoutSuccessHandler((req, resp, auth) -&gt; {
+//                    resp.setContentType(&quot;application/json;charset=UTF-8&quot;);
+//                    PrintWriter out = resp.getWriter();
+//                    resp.setStatus(200);
+//                    Map&lt;String, String&gt; result = Map.of(&quot;message&quot;, &quot;登出成功&quot;);
+//                    ObjectMapper om = new ObjectMapper();
+//                    out.write(om.writeValueAsString(result));
+//                    out.flush();
+//                    out.close();
+//                })
+//                .and()
+//                .csrf()
+//                .disable();
+//    }
+
+//    @Bean
+//    LoginAuthenticationFilter loginAuthenticationFilter() throws Exception {
+//        LoginAuthenticationFilter filter = new LoginAuthenticationFilter();
+//        filter.setAuthenticationManager(authenticationManagerBean());
+//        filter.setAuthenticationSuccessHandler(new AuthenticationSuccessHandlerImpl());
+//        filter.setAuthenticationFailureHandler(new AuthenticationFailureHandlerImpl());
+//        filter.setFilterProcessesUrl(&quot;/login&quot;);
+//        return filter;
+//    }
+//
+//    @Override
+//    @Bean
+//    public AuthenticationManager authenticationManagerBean() throws Exception {
+//        return super.authenticationManagerBean();
+//    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
