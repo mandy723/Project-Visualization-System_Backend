@@ -253,7 +253,6 @@ class GithubCommitLoaderThread extends Thread {
     }
 
     public void run() {
-        logger.debug(i++);
         //todo get data since last commit date to now
         Map<String, Object> graphQlQuery = new HashMap<>();
         graphQlQuery.put("query", "{repository(owner: \"" + this.repoOwner + "\", name:\"" + this.repoName + "\") {" +
@@ -362,9 +361,6 @@ class GithubIssueLoaderThread extends Thread {
             githubIssueDTO.setRepoName(repoName);
             githubIssueDTO.setCreatedAt(entity.get("created_at"));
             githubIssueDTO.setClosedAt(entity.get("closed_at"));
-
-            logger.debug("==================");
-            logger.debug(githubIssueDTO);
 
             synchronized (lock) {
                 githubIssueDTOList.add(githubIssueDTO);
