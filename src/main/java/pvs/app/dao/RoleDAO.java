@@ -2,12 +2,11 @@ package pvs.app.dao;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import pvs.app.entity.Member;
+import pvs.app.entity.Role;
 
 import java.util.List;
 
 @Repository
-public interface MemberDAO extends CrudRepository<Member, Long> {
-    Member findByUsername(String username);
-    Member findById(long id);
+public interface RoleDAO extends CrudRepository<Role, Long> {
+//    List<Role> findAllByUserId(Long userId);
 }

@@ -1,79 +1,86 @@
 package pvs.app.config;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.cors.CorsConfiguration;
+import pvs.app.filter.JwtTokenFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
-                .and().authorizeRequests()
-                .anyRequest().permitAll()
-                .and().csrf().disable();
+    static final Logger logger = LogManager.getLogger(SecurityConfig.class.getName());
+
+    @Qualifier("userDetailsServiceImpl")
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+
+        //校驗使用者
+        auth.userDetailsService( userDetailsService ).passwordEncoder( new PasswordEncoder() {
+            //對密碼進行加密
+            @Override
+            public String encode(CharSequence charSequence) {
+                System.out.println(charSequence.toString());
+                return DigestUtils.md5DigestAsHex(charSequence.toString().getBytes());
+            }
+            //對密碼進行判斷匹配
+            @Override
+            public boolean matches(CharSequence charSequence, String s) {
+                String encode = DigestUtils.md5DigestAsHex(charSequence.toString().getBytes());
+                boolean res = s.equals( encode );
+                return res;
+            }
+        } );
+
     }
 
-//    @Bean
-//    PasswordEncoder passwordEncoder() {
-//        return NoOpPasswordEncoder.getInstance();
-//    }
-//
-//    @Override
-//    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.inMemoryAuthentication()
-//                .withUser("admin").password("123").roles("ADMIN")
-//                .and()
-//                .withUser("user").password("123").roles("USER");
-//    }
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        logger.debug(http);
 
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//        http.exceptionHandling()
-//                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
-//                .accessDeniedHandler(new AccessDeniedHandlerImpl())
-//                .and()
-//                .addFilterAt(loginAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-//                .authorizeRequests()
-//                .antMatchers("/admin/**").hasRole("ADMIN")
-////                .antMatchers("/**").hasRole("USER")
-//                .and()
-//                .logout()
-//                .logoutUrl("/logout")
-//                .invalidateHttpSession(true)
-//                .logoutSuccessHandler((req, resp, auth) -> {
-//                    resp.setContentType("application/json;charset=UTF-8");
-//                    PrintWriter out = resp.getWriter();
-//                    resp.setStatus(200);
-//                    Map<String, String> result = Map.of("message", "登出成功");
-//                    ObjectMapper om = new ObjectMapper();
-//                    out.write(om.writeValueAsString(result));
-//                    out.flush();
-//                    out.close();
-//                })
-//                .and()
-//                .csrf()
-//                .disable();
-//    }
+        http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
+                .and().csrf().disable()
+                //因為使用JWT，所以不需要HttpSession
+                .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS).and()
+                .authorizeRequests()
+                //OPTIONS請求全部放行
+                .antMatchers( HttpMethod.OPTIONS, "/**").permitAll()
+                //登入介面放行
+                .antMatchers("/auth/login").permitAll()
+                //其他介面全部接受驗證
+                .anyRequest().authenticated();
 
-//    @Bean
-//    LoginAuthenticationFilter loginAuthenticationFilter() throws Exception {
-//        LoginAuthenticationFilter filter = new LoginAuthenticationFilter();
-//        filter.setAuthenticationManager(authenticationManagerBean());
-//        filter.setAuthenticationSuccessHandler(new AuthenticationSuccessHandlerImpl());
-//        filter.setAuthenticationFailureHandler(new AuthenticationFailureHandlerImpl());
-//        filter.setFilterProcessesUrl("/login");
-//        return filter;
-//    }
-//
-//    @Override
-//    @Bean
-//    public AuthenticationManager authenticationManagerBean() throws Exception {
-//        return super.authenticationManagerBean();
-//    }
+        //使用自定義的 Token過濾器 驗證請求的Token是否合法
+        http.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+        http.headers().cacheControl();
+    }
 
+    @Bean
+    public JwtTokenFilter authenticationTokenFilterBean() {
+        return new JwtTokenFilter();
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 }

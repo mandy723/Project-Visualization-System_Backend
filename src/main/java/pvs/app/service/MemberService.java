@@ -16,7 +16,7 @@ public class MemberService {
 
     public void save(MemberDTO bo) {
         Member entity = new Member();
-        entity.setAccount(bo.getAccount());
+        entity.setUsername(bo.getUsername());
         entity.setPassword(bo.getPassword());
         memberDAO.save(entity);
     }
@@ -24,8 +24,8 @@ public class MemberService {
     public MemberDTO get(long id) {
         Member entity = memberDAO.findById(id);
         MemberDTO bo = new MemberDTO();
-        bo.setId(entity.getId());
-        bo.setAccount(entity.getAccount());
+        bo.setId(entity.getMemberId());
+        bo.setUsername(entity.getUsername());
         bo.setPassword(entity.getPassword());
         return bo;
     }

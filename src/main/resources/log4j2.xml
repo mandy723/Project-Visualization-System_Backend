@@ -33,6 +33,15 @@
         <Logger name="pvs.app.controller.SonarApiController" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
+        <Logger name="pvs.app.filter.JwtTokenFilter" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="pvs.app.config.SecurityConfig" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="pvs.app.service.AuthService" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
         <Root level="error">
             <AppenderRef ref="Console"/>
         </Root>
