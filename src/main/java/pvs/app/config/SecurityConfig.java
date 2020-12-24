@@ -38,15 +38,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             //對密碼進行加密
             @Override
             public String encode(CharSequence charSequence) {
-                System.out.println(charSequence.toString());
                 return DigestUtils.md5DigestAsHex(charSequence.toString().getBytes());
             }
             //對密碼進行判斷匹配
             @Override
             public boolean matches(CharSequence charSequence, String s) {
                 String encode = DigestUtils.md5DigestAsHex(charSequence.toString().getBytes());
-                boolean res = s.equals( encode );
-                return res;
+                return s.equals( encode );
             }
         } );
 
@@ -65,6 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers( HttpMethod.OPTIONS, "/**").permitAll()
                 //登入介面放行
                 .antMatchers("/auth/login").permitAll()
+                .antMatchers("/admin/**").access("hasAuthority('ADMIN')")
                 //其他介面全部接受驗證
                 .anyRequest().authenticated();
 

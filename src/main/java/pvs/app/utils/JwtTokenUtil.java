@@ -62,27 +62,24 @@ public class JwtTokenUtil implements Serializable {
      * 根據token獲取username
      */
     public String getUsernameFromToken(String token) {
-        String username = getClaimsFromToken( token ).getSubject();
-        return username;
+        return getClaimsFromToken( token ).getSubject();
     }
 
     /**
      * 獲取token的過期時間
      */
     public Date getExpirationDateFromToken(String token) {
-        Date expiration = getClaimsFromToken( token ).getExpiration();
-        return expiration;
+        return getClaimsFromToken( token ).getExpiration();
     }
 
     /**
      * 解析JWT
      */
     private Claims getClaimsFromToken(String token) {
-        Claims claims = Jwts.parser()
+        return Jwts.parser()
                 .setSigningKey( SECRET )
                 .parseClaimsJws( token )
                 .getBody();
-        return claims;
     }
 
 }
