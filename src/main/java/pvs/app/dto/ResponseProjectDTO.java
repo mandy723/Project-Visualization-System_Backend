@@ -1,46 +1,17 @@
 package pvs.app.dto;
 
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Data
 public class ResponseProjectDTO {
     Long projectId;
     String projectName;
     String avatarURL;
     List<RepositoryDTO> repositoryDTOList = new ArrayList<>();
-
-    public Long getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
-    }
-
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    public String getAvatarURL() {
-        return avatarURL;
-    }
-
-    public void setAvatarURL(String avatarURL) {
-        this.avatarURL = avatarURL;
-    }
-
-    public List<RepositoryDTO> getRepositoryDTOList() {
-        return repositoryDTOList;
-    }
-
-    public void setRepositoryDTOList(List<RepositoryDTO> repositoryDTOList) {
-        this.repositoryDTOList = repositoryDTOList;
-    }
 
     @Override
     public boolean equals(Object o) {
