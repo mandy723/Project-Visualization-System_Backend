@@ -23,7 +23,7 @@ public class SonarApiService {
 
     private final WebClient webClient;
 
-    private String token = System.getenv("PVS_SONAR_TOKEN"); //todo get token from database
+    private String token = System.getenv("PVS_SONAR_TOKEN");
 
     public SonarApiService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl("http://140.124.181.143:9002/api")

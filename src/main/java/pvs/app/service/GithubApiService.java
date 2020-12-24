@@ -23,7 +23,7 @@ public class GithubApiService {
 
     private Map<String, Object> graphQlQuery;
 
-    private String token = System.getenv("PVS_GITHUB_TOKEN"); //todo get token from database
+    private String token = System.getenv("PVS_GITHUB_TOKEN");
 
     private final GithubCommitService githubCommitService;
 
@@ -135,7 +135,7 @@ public class GithubApiService {
                                 this.githubCommitService,
                                 owner,
                                 name,
-                                cursor + " " + String.valueOf(i*100));
+                                cursor + " " + (i*100));
                 githubCommitLoaderThreadList.add(githubCommitLoaderThread);
                 githubCommitLoaderThread.start();
             }
@@ -185,30 +185,11 @@ public class GithubApiService {
                 thread.join();
             }
         }
-//        this.setGraphQlGetIssuesQuery(owner, name);
-//        //todo use thread get commits from Github
-//        String responseJson = this.webClient.post()
-//                .body(BodyInserters.fromObject(this.graphQlQuery))
-//                .exchange()
-//                .block()
-//                .bodyToMono(String.class)
-//                .block();
-//
-//        logger.debug("responseJson ====");
-//        logger.debug(responseJson);
-//
-//        ObjectMapper mapper = new ObjectMapper();
-//        Optional<JsonNode> issues = Optional.ofNullable(mapper.readTree(responseJson))
-//                .map(resp -> resp.get("data"))
-//                    .map(data -> data.get("repository"))
-//                        .map(repo -> repo.get("issues"))
-//                            .map(issue -> issue.get("nodes"));
         return githubIssueDTOList;
     }
 
     public JsonNode getAvatarURL(String owner) throws IOException {
         this.setGraphQlGetAvatarQuery(owner);
-        //todo use thread get commits from Github
         String responseJson = this.webClient.post()
                 .body(BodyInserters.fromObject(this.graphQlQuery))
                 .exchange()
@@ -233,7 +214,6 @@ public class GithubApiService {
 class GithubCommitLoaderThread extends Thread {
 
     private static Object lock = new Object();
-    private static int i = 0;
 
     static final Logger logger = LogManager.getLogger(GithubCommitLoaderThread.class.getName());
 
@@ -252,8 +232,8 @@ class GithubCommitLoaderThread extends Thread {
         this.webClient = webClient;
     }
 
+    @Override
     public void run() {
-        //todo get data since last commit date to now
         Map<String, Object> graphQlQuery = new HashMap<>();
         graphQlQuery.put("query", "{repository(owner: \"" + this.repoOwner + "\", name:\"" + this.repoName + "\") {" +
                 "defaultBranchRef {" +
@@ -316,14 +296,13 @@ class GithubCommitLoaderThread extends Thread {
 
 class GithubIssueLoaderThread extends Thread {
 
-    private final String token = System.getenv("PVS_GITHUB_TOKEN"); //todo get token from database
+    private final String token = System.getenv("PVS_GITHUB_TOKEN");
     private static Object lock = new Object();
     static final Logger logger = LogManager.getLogger(GithubIssueLoaderThread.class.getName());
 
     private List<GithubIssueDTO> githubIssueDTOList;
     private String repoOwner;
     private String repoName;
-    private String cursor;
     private WebClient webClient;
     private int page;
 
@@ -338,6 +317,7 @@ class GithubIssueLoaderThread extends Thread {
         this.page = page;
     }
 
+    @Override
     public void run() {
         String responseJson = this.webClient.get()
                 .uri("/"+ this.repoOwner +"/"+ this.repoName +"/issues?page="+ this.page +"&per_page=100&state=all")

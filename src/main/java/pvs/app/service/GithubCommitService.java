@@ -4,12 +4,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import pvs.app.controller.GithubApiController;
 import pvs.app.entity.GithubCommit;
 import pvs.app.dto.GithubCommitDTO;
 import pvs.app.dao.GithubCommitDAO;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 

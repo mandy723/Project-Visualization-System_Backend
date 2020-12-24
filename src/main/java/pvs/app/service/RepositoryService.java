@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RepositoryService {
     private final WebClient webClient;
 
-    private String token = System.getenv("PVS_GITHUB_TOKEN"); //todo get token from database
+    private String token = System.getenv("PVS_GITHUB_TOKEN");
 
     static final Logger logger = LogManager.getLogger(RepositoryService.class.getName());
 
@@ -22,8 +22,8 @@ public class RepositoryService {
                 .build();
     }
 
-    public boolean checkURL(String URL) {
-        String targetURL = URL.replace("github.com", "api.github.com/repos");
+    public boolean checkURL(String url) {
+        String targetURL = url.replace("github.com", "api.github.com/repos");
         AtomicBoolean result = new AtomicBoolean(false);
         this.webClient
             .get()
