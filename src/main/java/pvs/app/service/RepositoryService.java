@@ -9,6 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
+@SuppressWarnings("squid:S1192")
 public class RepositoryService {
     private final WebClient webClient;
 

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Service
+@SuppressWarnings("squid:S1192")
 public class SonarApiService {
 
     static final Logger logger = LogManager.getLogger(SonarApiService.class.getName());
