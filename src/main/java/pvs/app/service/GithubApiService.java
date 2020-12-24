@@ -71,22 +71,7 @@ public class GithubApiService {
         this.graphQlQuery = graphQl;
     }
 
-    private void setGraphQlGetIssuesQuery(String owner, String name) {
-        //todo get data since last commit date to now
-        Map<String, Object> graphQl = new HashMap<>();
-        graphQl.put("query", "{repository(owner: \"" + owner + "\", name:\"" + name + "\") {" +
-                                "issues (first:100) {" +
-                                    "nodes {" +
-                                        "createdAt\n" +
-                                        "closedAt\n" +
-                                    "}" +
-                                "}" +
-                            "}}");
-        this.graphQlQuery = graphQl;
-    }
-
     private void setGraphQlGetAvatarQuery(String owner) {
-        //todo get data since last commit date to now
         Map<String, Object> graphQl = new HashMap<>();
         graphQl.put("query", "{search(type: USER, query: \"in:username " + owner + "\", first: 1) {" +
                     "edges {" +

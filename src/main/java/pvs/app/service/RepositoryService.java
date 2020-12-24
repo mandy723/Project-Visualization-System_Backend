@@ -29,9 +29,9 @@ public class RepositoryService {
             .get()
             .uri(targetURL)
             .exchange()
-            .doAfterSuccessOrError((clientResponse, throwable) -> {
-                result.set(clientResponse.statusCode().equals(HttpStatus.OK));
-            })
+            .doAfterSuccessOrError((clientResponse, throwable) ->
+                result.set(clientResponse.statusCode().equals(HttpStatus.OK))
+            )
             .block();
 
         return result.get();
