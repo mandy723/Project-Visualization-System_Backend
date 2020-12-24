@@ -1,11 +1,14 @@
 package pvs.app.entity;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Objects;
 
 @Entity
+@Data
 public class GithubCommit {
 
     @Id
@@ -40,86 +43,6 @@ public class GithubCommit {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="repository_id")
     private Repository repository;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getRepoOwner() {
-        return repoOwner;
-    }
-
-    public void setRepoOwner(String repoOwner) {
-        this.repoOwner = repoOwner;
-    }
-
-    public String getRepoName() {
-        return repoName;
-    }
-
-    public void setRepoName(String repoName) {
-        this.repoName = repoName;
-    }
-
-    public Date getCommittedDate() {
-        return committedDate;
-    }
-
-    public void setCommittedDate(Date committedDate) {
-        this.committedDate = committedDate;
-    }
-
-    public int getAdditions() {
-        return additions;
-    }
-
-    public void setAdditions(int additions) {
-        this.additions = additions;
-    }
-
-    public int getDeletions() {
-        return deletions;
-    }
-
-    public void setDeletions(int deletions) {
-        this.deletions = deletions;
-    }
-
-    public int getChangeFiles() {
-        return changeFiles;
-    }
-
-    public void setChangeFiles(int changeFiles) {
-        this.changeFiles = changeFiles;
-    }
-
-    public String getAuthorName() {
-        return authorName;
-    }
-
-    public void setAuthorName(String authorName) {
-        this.authorName = authorName;
-    }
-
-    public String getAuthorEmail() {
-        return authorEmail;
-    }
-
-    public void setAuthorEmail(String authorEmail) {
-        this.authorEmail = authorEmail;
-    }
-
-    public Repository getRepository() {
-        return repository;
-    }
-
-    public void setRepository(Repository repository) {
-        this.repository = repository;
-    }
 
     @Override
     public boolean equals(Object o) {
