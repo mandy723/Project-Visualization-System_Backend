@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
+@SuppressWarnings("squid:S1192")
 public class GithubApiService {
 
     static final Logger logger = LogManager.getLogger(GithubApiService.class.getName());
