@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.DigestUtils;
@@ -44,6 +45,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             @Override
             public boolean matches(CharSequence charSequence, String s) {
                 String encode = DigestUtils.md5DigestAsHex(charSequence.toString().getBytes());
+                logger.debug("s: "+s);
+                logger.debug("charSequence: "+charSequence.toString());
+                logger.debug("encode: "+encode);
+                logger.debug("equals: "+s.equals(encode));
+
                 return s.equals( encode );
             }
         } );
@@ -59,10 +65,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //因為使用JWT，所以不需要HttpSession
                 .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-                //OPTIONS請求全部放行
-                .antMatchers( HttpMethod.OPTIONS, "/**").permitAll()
                 //登入介面放行
                 .antMatchers("/auth/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/member").permitAll()
                 .antMatchers("/admin/**").access("hasAuthority('ADMIN')")
                 //其他介面全部接受驗證
                 .anyRequest().authenticated();
@@ -81,5 +86,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public PasswordEncoder encoder() {
+        return new BCryptPasswordEncoder();
     }
 }

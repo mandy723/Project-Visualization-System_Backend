@@ -45,6 +45,13 @@
         <Logger name="pvs.app.service.impl.UserDetailsServiceImpl" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
+        <Logger name="pvs.app.controller.MemberController" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="pvs.app.controller.AuthController" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+
         <Root level="error">
             <AppenderRef ref="Console"/>
         </Root>

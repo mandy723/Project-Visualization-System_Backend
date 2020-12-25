@@ -15,8 +15,11 @@ public class Member implements UserDetails {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long memberId;
 
+    @Column(unique=true)
+    @NotNull
     private String username;
 
+    @NotNull
     private String password;
 
     @ManyToMany(cascade = { CascadeType.ALL },fetch=FetchType.EAGER)
