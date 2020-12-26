@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import pvs.app.dao.ProjectDAO;
+import pvs.app.dto.AddSonarRepositoryDTO;
 import pvs.app.dto.CreateProjectDTO;
 import pvs.app.dto.RepositoryDTO;
 import pvs.app.dto.ResponseProjectDTO;
@@ -81,5 +82,15 @@ public class ProjectService {
             projectDTOList.add(projectDTO);
         }
         return projectDTOList;
+    }
+
+    public void addSonarRepo(AddSonarRepositoryDTO addSonarRepositoryDTO) {
+        Project project = projectDAO.findById(addSonarRepositoryDTO.getProjectId()).get();
+
+        Repository repository = new Repository();
+        repository.setUrl(addSonarRepositoryDTO.getRepositoryURL());
+        repository.setType("sonar");
+        project.getRepositorySet().add(repository);
+        projectDAO.save(project);
     }
 }

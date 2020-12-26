@@ -1,9 +1,11 @@
 package pvs.app.controller;
 
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pvs.app.dto.AddSonarRepositoryDTO;
 import pvs.app.dto.CreateProjectDTO;
 import pvs.app.dto.ResponseProjectDTO;
 import pvs.app.service.ProjectService;
@@ -27,8 +29,25 @@ public class ProjectController {
     public ResponseEntity<String> createProject(@RequestBody CreateProjectDTO projectDTO) {
         //我在檢查
         try{
-            if(repositoryService.checkURL(projectDTO.getRepositoryURL())) {
+            if(repositoryService.checkGithubURL(projectDTO.getRepositoryURL())) {
                 projectService.create(projectDTO);
+
+                return ResponseEntity.status(HttpStatus.OK).body("你成功了");
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你連URL都不會打嗎");
+            }
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你去死吧");
+        }
+    }
+
+    @PostMapping("/project/{projectId}/repository")
+    public ResponseEntity<String> addSonarRepository(@RequestBody AddSonarRepositoryDTO addSonarRepositoryDTO) {
+        //我在檢查
+        try{
+            if(repositoryService.checkSonarURL(addSonarRepositoryDTO.getRepositoryURL())) {
+                projectService.addSonarRepo(addSonarRepositoryDTO);
 
                 return ResponseEntity.status(HttpStatus.OK).body("你成功了");
             }

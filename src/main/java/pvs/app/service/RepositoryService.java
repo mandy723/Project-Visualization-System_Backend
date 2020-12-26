@@ -23,7 +23,7 @@ public class RepositoryService {
                 .build();
     }
 
-    public boolean checkURL(String url) {
+    public boolean checkGithubURL(String url) {
         String targetURL = url.replace("github.com", "api.github.com/repos");
         AtomicBoolean result = new AtomicBoolean(false);
         this.webClient
@@ -35,6 +35,21 @@ public class RepositoryService {
             )
             .block();
 
+        return result.get();
+    }
+
+    public boolean checkSonarURL(String url) {
+        String targetURL = url.replace("dashboard?id", "api/components/show?component");
+        AtomicBoolean result = new AtomicBoolean(false);
+
+        this.webClient
+            .get()
+            .uri(targetURL)
+            .exchange()
+            .doAfterSuccessOrError((clientResponse, throwable) ->
+                    result.set(clientResponse.statusCode().equals(HttpStatus.OK))
+            )
+            .block();
         return result.get();
     }
 }
