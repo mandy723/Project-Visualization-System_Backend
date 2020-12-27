@@ -47,7 +47,7 @@ public class ProjectServiceTest {
     public void setup() throws IOException {
         projectDTO = new CreateProjectDTO();
         projectDTO.setProjectName("react");
-        projectDTO.setRepositoryURL("https://github.com/facebook/react");
+        projectDTO.setGithubRepositoryURL("https://github.com/facebook/react");
 
         project = new Project();
         project.setMemberId(1L);

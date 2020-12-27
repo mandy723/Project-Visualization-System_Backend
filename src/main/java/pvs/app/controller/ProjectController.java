@@ -1,10 +1,13 @@
 package pvs.app.controller;
 
 import org.apache.coyote.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pvs.app.dto.AddGithubRepositoryDTO;
 import pvs.app.dto.AddSonarRepositoryDTO;
 import pvs.app.dto.CreateProjectDTO;
 import pvs.app.dto.ResponseProjectDTO;
@@ -17,6 +20,9 @@ import java.util.Optional;
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class ProjectController {
+
+    static final Logger logger = LogManager.getLogger(ProjectController.class.getName());
+
     private final ProjectService projectService;
     private final RepositoryService repositoryService;
 
@@ -25,24 +31,40 @@ public class ProjectController {
         this.repositoryService = repositoryService;
     }
 
+    @GetMapping("/repository/github/check")
+    public ResponseEntity<String> checkGithubURL(@RequestParam("url") String url) {
+        //我在檢查
+        if(repositoryService.checkGithubURL(url)) {
+            return ResponseEntity.status(HttpStatus.OK).body("你成功了");
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你連URL都不會打嗎");
+        }
+    }
+
+    @GetMapping("/repository/sonar/check")
+    public ResponseEntity<String> checkSonarURL(@RequestParam("url") String url) {
+        //我在檢查
+        if(repositoryService.checkSonarURL(url)) {
+            return ResponseEntity.status(HttpStatus.OK).body("你成功了");
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你連URL都不會打嗎");
+        }
+    }
+
     @PostMapping("/project")
     public ResponseEntity<String> createProject(@RequestBody CreateProjectDTO projectDTO) {
         //我在檢查
         try{
-            if(repositoryService.checkGithubURL(projectDTO.getRepositoryURL())) {
-                projectService.create(projectDTO);
-
-                return ResponseEntity.status(HttpStatus.OK).body("你成功了");
-            }
-            else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你連URL都不會打嗎");
-            }
+            projectService.create(projectDTO);
+            return ResponseEntity.status(HttpStatus.OK).body("你成功了");
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你去死吧");
         }
     }
 
-    @PostMapping("/project/{projectId}/repository")
+    @PostMapping("/project/{projectId}/repository/sonar")
     public ResponseEntity<String> addSonarRepository(@RequestBody AddSonarRepositoryDTO addSonarRepositoryDTO) {
         //我在檢查
         try{
@@ -58,6 +80,27 @@ public class ProjectController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你去死吧");
         }
     }
+
+    @PostMapping("/project/{projectId}/repository/github")
+    public ResponseEntity<String> addGithubRepository(@RequestBody AddGithubRepositoryDTO addGithubRepositoryDTO) {
+        //我在檢查
+        try{
+            logger.debug(addGithubRepositoryDTO.getProjectId());
+            logger.debug(addGithubRepositoryDTO.getRepositoryURL());
+
+            if(repositoryService.checkGithubURL(addGithubRepositoryDTO.getRepositoryURL())) {
+                projectService.addGithubRepo(addGithubRepositoryDTO);
+
+                return ResponseEntity.status(HttpStatus.OK).body("你成功了");
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你連URL都不會打嗎");
+            }
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你去死吧");
+        }
+    }
+
 
     @GetMapping("/project/{memberId}")
     public ResponseEntity<List<ResponseProjectDTO>> readMemberAllProjects(@PathVariable Long memberId) {

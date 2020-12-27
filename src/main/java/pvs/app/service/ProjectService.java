@@ -5,10 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import pvs.app.dao.ProjectDAO;
-import pvs.app.dto.AddSonarRepositoryDTO;
-import pvs.app.dto.CreateProjectDTO;
-import pvs.app.dto.RepositoryDTO;
-import pvs.app.dto.ResponseProjectDTO;
+import pvs.app.dto.*;
 import pvs.app.entity.Project;
 import pvs.app.entity.Repository;
 
@@ -26,40 +23,31 @@ public class ProjectService {
 
     static final Logger logger = LogManager.getLogger(ProjectService.class.getName());
 
-    private List<String> typeList = Arrays.asList("github", "sonar");
-
     public ProjectService(ProjectDAO projectDAO, GithubApiService githubApiService) {
         this.projectDAO = projectDAO;
         this.githubApiService = githubApiService;
     }
 
     public void create(CreateProjectDTO projectDTO) throws IOException {
+        Project savedProject;
         Project project = new Project();
         project.setMemberId(1L);
         project.setName(projectDTO.getProjectName());
+        savedProject = projectDAO.save(project);
 
-        String url = projectDTO.getRepositoryURL();
-        String owner = url.split("/")[3];
-
-        logger.debug(owner);
-
-        JsonNode responseJson = githubApiService.getAvatarURL(owner);
-
-        logger.debug(responseJson);
-
-        if(responseJson != null) {
-            String json = responseJson.textValue();
-            project.setAvatarURL(json);
+        if(!projectDTO.getGithubRepositoryURL().equals("")){
+            AddGithubRepositoryDTO addGithubRepositoryDTO = new AddGithubRepositoryDTO();
+            addGithubRepositoryDTO.setProjectId(savedProject.getProjectId());
+            addGithubRepositoryDTO.setRepositoryURL(projectDTO.getGithubRepositoryURL());
+            addGithubRepo(addGithubRepositoryDTO);
         }
 
-        Repository repository = new Repository();
-        repository.setUrl(projectDTO.getRepositoryURL());
-        for(String type : typeList) {
-            if(projectDTO.getRepositoryURL().contains(type))
-                repository.setType(type);
+        if(!projectDTO.getSonarRepositoryURL().equals("")){
+            AddSonarRepositoryDTO addSonarRepositoryDTO = new AddSonarRepositoryDTO();
+            addSonarRepositoryDTO.setProjectId(savedProject.getProjectId());
+            addSonarRepositoryDTO.setRepositoryURL(projectDTO.getSonarRepositoryURL());
+            addSonarRepo(addSonarRepositoryDTO);
         }
-        project.setRepositorySet(Set.of(repository));
-        projectDAO.save(project);
     }
 
     public List<ResponseProjectDTO> getMemberProjects(Long memberId) {
@@ -91,6 +79,24 @@ public class ProjectService {
         repository.setUrl(addSonarRepositoryDTO.getRepositoryURL());
         repository.setType("sonar");
         project.getRepositorySet().add(repository);
+        projectDAO.save(project);
+    }
+
+    public void addGithubRepo(AddGithubRepositoryDTO addGithubRepositoryDTO) throws IOException {
+        Project project = projectDAO.findById(addGithubRepositoryDTO.getProjectId()).get();
+        String url = addGithubRepositoryDTO.getRepositoryURL();
+        Repository repository = new Repository();
+        repository.setUrl(url);
+        repository.setType("github");
+        project.getRepositorySet().add(repository);
+        String owner = url.split("/")[3];
+        JsonNode responseJson = githubApiService.getAvatarURL(owner);
+
+        if(responseJson != null) {
+            String json = responseJson.textValue();
+            project.setAvatarURL(json);
+        }
+
         projectDAO.save(project);
     }
 }
