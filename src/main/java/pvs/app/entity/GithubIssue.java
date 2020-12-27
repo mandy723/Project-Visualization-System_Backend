@@ -6,8 +6,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-@Data
 @Entity
+@Data
 public class GithubIssue {
 
     @Id

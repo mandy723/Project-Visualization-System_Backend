@@ -1,6 +1,7 @@
 package pvs.app.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,7 @@ public class GithubApiController {
     }
 
 
+    @SneakyThrows
     @PostMapping("/commits/{repoOwner}/{repoName}")
     public ResponseEntity<String> postCommits(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException {
         Date lastUpdate;
@@ -44,12 +46,8 @@ public class GithubApiController {
             lastUpdate = githubCommitDTO.getCommittedDate();
         }
 
-        try {
-            githubApiService.getCommitsFromGithub(repoOwner, repoName, lastUpdate);
-            return ResponseEntity.status(HttpStatus.OK).body("");
-        } catch (InterruptedException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("");
-        }
+        githubApiService.getCommitsFromGithub(repoOwner, repoName, lastUpdate);
+        return ResponseEntity.status(HttpStatus.OK).body("");
     }
 
     @GetMapping("/commits/{repoOwner}/{repoName}")

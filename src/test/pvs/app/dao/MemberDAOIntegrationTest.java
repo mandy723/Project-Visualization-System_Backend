@@ -25,23 +25,23 @@ public class MemberDAOIntegrationTest {
 
     @Before
     public void setup() {
-        member01.setUsername("aaaa");
+        member01.setAccount("aaaa");
         member01.setPassword("1234");
         member01 = memberDAO.save(member01);
     }
 
     @Test
     public void whenFindByAccount_thenReturnMember() {
-        Member foundEntity = memberDAO.findByUsername("aaaa");
+        Member foundEntity = memberDAO.findByAccount("aaaa");
 
-        assertEquals(member01.toString(), foundEntity.toString());
+        assertEquals(member01, foundEntity);
     }
 
     @Test
     public void whenFindById_thenReturnMember() {
-        Optional<Member> foundEntity = memberDAO.findById(member01.getMemberId());
+        Optional<Member> foundEntity = memberDAO.findById(member01.getId());
 
-        assertEquals(member01.toString(), foundEntity.orElse(null).toString());
+        assertEquals(member01, foundEntity.orElse(null));
     }
 
 }

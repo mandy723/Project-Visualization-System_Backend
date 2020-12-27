@@ -2,7 +2,6 @@ package pvs.app.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
@@ -36,46 +34,40 @@ public class ProjectServiceTest {
     @MockBean
     private ProjectDAO projectDAO;
 
-    CreateProjectDTO projectDTO;
-
-    Project project;
-
-    final String responseJson = "{\"avatarUrl\":\"https://avatars3.githubusercontent.com/u/17744001?u=038d9e068c4205d94c670d7d89fb921ec5b29782&v=4\"}";
-    Optional<JsonNode> mockAvatar;
-
-    @Before
-    public void setup() throws IOException {
-        projectDTO = new CreateProjectDTO();
+    @Test
+    public void create() throws IOException {
+        //given
+        CreateProjectDTO projectDTO = new CreateProjectDTO();
         projectDTO.setProjectName("react");
-        projectDTO.setGithubRepositoryURL("https://github.com/facebook/react");
+        projectDTO.setRepositoryURL("https://github.com/facebook/react");
 
-        project = new Project();
+        Project project = new Project();
         project.setMemberId(1L);
         project.setName(projectDTO.getProjectName());
 
+        String responseJson = "{\"avatarUrl\":\"https://avatars3.githubusercontent.com/u/17744001?u=038d9e068c4205d94c670d7d89fb921ec5b29782&v=4\"}";
         ObjectMapper mapper = new ObjectMapper();
-        mockAvatar = Optional.ofNullable(mapper.readTree(responseJson));
-    }
+        Optional<JsonNode> mockAvatar = Optional.ofNullable(mapper.readTree(responseJson));
 
-    @Test
-    public void create() throws IOException {
-        //context
+        //when
         when(githubApiService.getAvatarURL("facebook"))
                 .thenReturn(mockAvatar.orElse(null));
 
         when(projectDAO.save(new Project()))
                 .thenReturn(project);
 
-        //when
         projectService.create(projectDTO);
 
-        //then
+        //expect
         verify(githubApiService, times(1)).getAvatarURL("facebook");
     }
 
     @Test
     public void getMemberProjects() {
         //given
+        Project project = new Project();
+        project.setMemberId(1L);
+        project.setName("react");
         project.setAvatarURL("https://avatars3.githubusercontent.com/u/17744001?u=038d9e068c4205d94c670d7d89fb921ec5b29782&v=4");
         
         List<ResponseProjectDTO> projectDTOList = new ArrayList<>();
@@ -85,12 +77,10 @@ public class ProjectServiceTest {
         projectDTO.setAvatarURL(project.getAvatarURL());
 
         projectDTOList.add(projectDTO);
-
         //when
         when(projectDAO.findByMemberId(1L))
                 .thenReturn(List.of(project));
-        //then
-        assertTrue(projectDTOList.equals(projectService.getMemberProjects(1L)));
-
+        //expect
+        assertEquals(projectDTOList.toString(), projectService.getMemberProjects(1L).toString());
     }
 }

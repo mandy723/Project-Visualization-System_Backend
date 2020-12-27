@@ -7,8 +7,8 @@ import java.util.Date;
 
 @Data
 @AllArgsConstructor
-public class CodeCoverageDTO {
+public class CodeSmellDTO {
     Date date;
-    Double value;
+    Integer value;
 
 }

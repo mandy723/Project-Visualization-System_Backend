@@ -12,6 +12,7 @@ import pvs.app.dto.MemberDTO;
 import pvs.app.entity.Member;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
@@ -33,14 +34,13 @@ public class MemberServiceTest {
                 .thenReturn(member01);
 
         //given
-        member01.setMemberId(1L);
-        member01.setUsername("aaaa");
+        member01.setId(1L);
+        member01.setAccount("aaaa");
         member01.setPassword("1234");
 
         member01DTO.setId(1L);
-        member01DTO.setUsername("aaaa");
+        member01DTO.setAccount("aaaa");
         member01DTO.setPassword("1234");
-
         //when
         MemberDTO memberDTO = memberService.get(1L);
 

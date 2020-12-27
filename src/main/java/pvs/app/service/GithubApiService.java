@@ -2,7 +2,6 @@ package pvs.app.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
+@SuppressWarnings("squid:S1192")
 public class GithubApiService {
 
     static final Logger logger = LogManager.getLogger(GithubApiService.class.getName());
@@ -24,7 +24,7 @@ public class GithubApiService {
 
     private Map<String, Object> graphQlQuery;
 
-    private String token = System.getenv("PVS_GITHUB_TOKEN"); //todo get token from database
+    private String token = System.getenv("PVS_GITHUB_TOKEN");
 
     private final GithubCommitService githubCommitService;
 
@@ -72,22 +72,7 @@ public class GithubApiService {
         this.graphQlQuery = graphQl;
     }
 
-    private void setGraphQlGetIssuesQuery(String owner, String name) {
-        //todo get data since last commit date to now
-        Map<String, Object> graphQl = new HashMap<>();
-        graphQl.put("query", "{repository(owner: \"" + owner + "\", name:\"" + name + "\") {" +
-                                "issues (first:100) {" +
-                                    "nodes {" +
-                                        "createdAt\n" +
-                                        "closedAt\n" +
-                                    "}" +
-                                "}" +
-                            "}}");
-        this.graphQlQuery = graphQl;
-    }
-
     private void setGraphQlGetAvatarQuery(String owner) {
-        //todo get data since last commit date to now
         Map<String, Object> graphQl = new HashMap<>();
         graphQl.put("query", "{search(type: USER, query: \"in:username " + owner + "\", first: 1) {" +
                     "edges {" +
@@ -136,7 +121,7 @@ public class GithubApiService {
                                 this.githubCommitService,
                                 owner,
                                 name,
-                                cursor + " " + String.valueOf(i*100));
+                                cursor + " " + (i*100));
                 githubCommitLoaderThreadList.add(githubCommitLoaderThread);
                 githubCommitLoaderThread.start();
             }
@@ -186,30 +171,11 @@ public class GithubApiService {
                 thread.join();
             }
         }
-//        this.setGraphQlGetIssuesQuery(owner, name);
-//        //todo use thread get commits from Github
-//        String responseJson = this.webClient.post()
-//                .body(BodyInserters.fromObject(this.graphQlQuery))
-//                .exchange()
-//                .block()
-//                .bodyToMono(String.class)
-//                .block();
-//
-//        logger.debug("responseJson ====");
-//        logger.debug(responseJson);
-//
-//        ObjectMapper mapper = new ObjectMapper();
-//        Optional<JsonNode> issues = Optional.ofNullable(mapper.readTree(responseJson))
-//                .map(resp -> resp.get("data"))
-//                    .map(data -> data.get("repository"))
-//                        .map(repo -> repo.get("issues"))
-//                            .map(issue -> issue.get("nodes"));
         return githubIssueDTOList;
     }
 
     public JsonNode getAvatarURL(String owner) throws IOException {
         this.setGraphQlGetAvatarQuery(owner);
-        //todo use thread get commits from Github
         String responseJson = this.webClient.post()
                 .body(BodyInserters.fromObject(this.graphQlQuery))
                 .exchange()
@@ -234,7 +200,6 @@ public class GithubApiService {
 class GithubCommitLoaderThread extends Thread {
 
     private static Object lock = new Object();
-    private static int i = 0;
 
     static final Logger logger = LogManager.getLogger(GithubCommitLoaderThread.class.getName());
 
@@ -253,10 +218,8 @@ class GithubCommitLoaderThread extends Thread {
         this.webClient = webClient;
     }
 
-    @SneakyThrows
+    @Override
     public void run() {
-        logger.debug(i++);
-        //todo get data since last commit date to now
         Map<String, Object> graphQlQuery = new HashMap<>();
         graphQlQuery.put("query", "{repository(owner: \"" + this.repoOwner + "\", name:\"" + this.repoName + "\") {" +
                 "defaultBranchRef {" +
@@ -288,13 +251,18 @@ class GithubCommitLoaderThread extends Thread {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        Optional<JsonNode> commits = Optional.ofNullable(mapper.readTree(responseJson))
-                .map(resp -> resp.get("data"))
-                .map(data -> data.get("repository"))
-                .map(repo -> repo.get("defaultBranchRef"))
-                .map(branch -> branch.get("target"))
-                .map(tag -> tag.get("history"))
-                .map(hist -> hist.get("nodes"));
+        Optional<JsonNode> commits = null;
+        try {
+            commits = Optional.ofNullable(mapper.readTree(responseJson))
+                    .map(resp -> resp.get("data"))
+                    .map(data -> data.get("repository"))
+                    .map(repo -> repo.get("defaultBranchRef"))
+                    .map(branch -> branch.get("target"))
+                    .map(tag -> tag.get("history"))
+                    .map(hist -> hist.get("nodes"));
+        } catch (IOException e) {
+            Thread.currentThread().interrupt();
+        }
 
         commits.get().forEach(entity->{
             GithubCommitDTO githubCommitDTO = new GithubCommitDTO();
@@ -314,14 +282,13 @@ class GithubCommitLoaderThread extends Thread {
 
 class GithubIssueLoaderThread extends Thread {
 
-    private final String token = System.getenv("PVS_GITHUB_TOKEN"); //todo get token from database
+    private final String token = System.getenv("PVS_GITHUB_TOKEN");
     private static Object lock = new Object();
     static final Logger logger = LogManager.getLogger(GithubIssueLoaderThread.class.getName());
 
     private List<GithubIssueDTO> githubIssueDTOList;
     private String repoOwner;
     private String repoName;
-    private String cursor;
     private WebClient webClient;
     private int page;
 
@@ -336,7 +303,7 @@ class GithubIssueLoaderThread extends Thread {
         this.page = page;
     }
 
-    @SneakyThrows
+    @Override
     public void run() {
         String responseJson = this.webClient.get()
                 .uri("/"+ this.repoOwner +"/"+ this.repoName +"/issues?page="+ this.page +"&per_page=100&state=all")
@@ -346,7 +313,12 @@ class GithubIssueLoaderThread extends Thread {
                 .block();
         ObjectMapper mapper = new ObjectMapper();
 
-        Optional<JsonNode> issueList = Optional.ofNullable(mapper.readTree(responseJson));
+        Optional<JsonNode> issueList = null;
+        try {
+            issueList = Optional.ofNullable(mapper.readTree(responseJson));
+        } catch (IOException e) {
+            Thread.currentThread().interrupt();
+        }
 
 
         issueList.get().forEach(entity->{
@@ -355,9 +327,6 @@ class GithubIssueLoaderThread extends Thread {
             githubIssueDTO.setRepoName(repoName);
             githubIssueDTO.setCreatedAt(entity.get("created_at"));
             githubIssueDTO.setClosedAt(entity.get("closed_at"));
-
-            logger.debug("==================");
-            logger.debug(githubIssueDTO);
 
             synchronized (lock) {
                 githubIssueDTOList.add(githubIssueDTO);

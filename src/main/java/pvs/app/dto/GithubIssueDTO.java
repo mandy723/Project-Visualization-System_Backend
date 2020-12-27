@@ -1,31 +1,19 @@
 package pvs.app.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import java.util.Date;
 
+@Data
 public class GithubIssueDTO {
     private String repoOwner;
     private String repoName;
     private Date createdAt;
     private Date closedAt;
 
-    public String getRepoOwner() {
-        return repoOwner;
-    }
-
-    public void setRepoOwner(String repoOwner) {
-        this.repoOwner = repoOwner;
-    }
-
-    public String getRepoName() {
-        return repoName;
-    }
-
-    public void setRepoName(String repoName) {
-        this.repoName = repoName;
-    }
 
     public Date getCreatedAt() {
         return createdAt;

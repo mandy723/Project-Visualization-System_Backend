@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Data
 @AllArgsConstructor
-public class CodeCoverageDTO {
+public class DuplicationDTO {
     Date date;
     Double value;
 
