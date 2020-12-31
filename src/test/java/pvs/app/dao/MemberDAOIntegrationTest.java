@@ -34,14 +34,14 @@ public class MemberDAOIntegrationTest {
     public void whenFindByAccount_thenReturnMember() {
         Member foundEntity = memberDAO.findByUsername("aaaa");
 
-        assertEquals(member01.toString(), foundEntity.toString());
+        assertEquals(member01.getUsername(), "aaaa");
     }
 
     @Test
     public void whenFindById_thenReturnMember() {
         Optional<Member> foundEntity = memberDAO.findById(member01.getMemberId());
 
-        assertEquals(member01.toString(), foundEntity.orElse(null).toString());
+        assertEquals(member01.getUsername(), foundEntity.orElse(null).getUsername());
     }
 
 }

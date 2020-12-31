@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.parameters.P;
 import org.springframework.test.context.junit4.SpringRunner;
 import pvs.app.Application;
 import pvs.app.dao.ProjectDAO;
@@ -48,8 +49,10 @@ public class ProjectServiceTest {
         projectDTO = new CreateProjectDTO();
         projectDTO.setProjectName("react");
         projectDTO.setGithubRepositoryURL("https://github.com/facebook/react");
+        projectDTO.setSonarRepositoryURL("");
 
         project = new Project();
+        project.setProjectId(1L);
         project.setMemberId(1L);
         project.setName(projectDTO.getProjectName());
 
@@ -63,8 +66,10 @@ public class ProjectServiceTest {
         when(githubApiService.getAvatarURL("facebook"))
                 .thenReturn(mockAvatar.orElse(null));
 
-        when(projectDAO.save(new Project()))
+        when(projectDAO.save(any(Project.class)))
                 .thenReturn(project);
+        when(projectDAO.findById(1L))
+                .thenReturn(Optional.of(project));
 
         //when
         projectService.create(projectDTO);
