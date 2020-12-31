@@ -61,16 +61,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         logger.debug(http);
 
         http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
-                .and().csrf().disable()
+                .and().csrf().disable();
                 //因為使用JWT，所以不需要HttpSession
-                .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests()
-                //登入介面放行
-                .antMatchers("/auth/login").permitAll()
-                .antMatchers(HttpMethod.POST, "/member").permitAll()
-                .antMatchers("/admin/**").access("hasAuthority('ADMIN')")
-                //其他介面全部接受驗證
-                .anyRequest().authenticated();
+//                .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS).and()
+//                .authorizeRequests()
+//                //登入介面放行
+//                .antMatchers("/auth/login").permitAll()
+//                .antMatchers(HttpMethod.POST, "/member").permitAll()
+//                .antMatchers("/admin/**").access("hasAuthority('ADMIN')")
+//                //其他介面全部接受驗證
+//                .anyRequest().authenticated();
 
         //使用自定義的 Token過濾器 驗證請求的Token是否合法
         http.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);

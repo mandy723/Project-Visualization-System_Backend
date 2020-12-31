@@ -7,8 +7,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import pvs.app.dto.GithubCommitDTO;
 import pvs.app.dto.GithubIssueDTO;
+import pvs.app.service.thread.GithubCommitLoaderThread;
+import pvs.app.service.thread.GithubIssueLoaderThread;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -20,13 +21,13 @@ public class GithubApiService {
 
     static final Logger logger = LogManager.getLogger(GithubApiService.class.getName());
 
-    private final WebClient webClient;
+    private WebClient webClient;
 
     private Map<String, Object> graphQlQuery;
 
     private String token = System.getenv("PVS_GITHUB_TOKEN");
 
-    private final GithubCommitService githubCommitService;
+    private GithubCommitService githubCommitService;
 
     public GithubApiService(WebClient.Builder webClientBuilder, GithubCommitService githubCommitService) {
         this.githubCommitService = githubCommitService;
@@ -34,6 +35,11 @@ public class GithubApiService {
                 .defaultHeader("Authorization", "Bearer " + token )
                 .build();
     }
+//
+//    public GithubApiService(WebClient.Builder builder, String url, GithubCommitService githubCommitService) {
+//        this.githubCommitService = githubCommitService;
+//        this.webClient = builder.baseUrl(url).defaultHeader("Authorization", "Bearer " + token ).build();
+//    }
 
     private String dateToISO8601(Date date) {
         SimpleDateFormat sdf;
@@ -150,7 +156,6 @@ public class GithubApiService {
                 .map(data -> data.get("repository"))
                 .map(repo -> repo.get("issues"));
 
-        logger.debug(paginationInfo);
         double totalCount = paginationInfo.get().get("totalCount").asInt();
         List<GithubIssueLoaderThread> githubIssueLoaderThreadList = new ArrayList<>();
 
@@ -197,140 +202,3 @@ public class GithubApiService {
     }
 }
 
-class GithubCommitLoaderThread extends Thread {
-
-    private static Object lock = new Object();
-
-    static final Logger logger = LogManager.getLogger(GithubCommitLoaderThread.class.getName());
-
-
-    private GithubCommitService githubCommitService;
-    private String repoOwner;
-    private String repoName;
-    private String cursor;
-    private WebClient webClient;
-
-    GithubCommitLoaderThread(WebClient webClient, GithubCommitService githubCommitService, String repoOwner, String repoName, String cursor) {
-        this.githubCommitService = githubCommitService;
-        this.repoOwner = repoOwner;
-        this.repoName = repoName;
-        this.cursor = cursor;
-        this.webClient = webClient;
-    }
-
-    @Override
-    public void run() {
-        Map<String, Object> graphQlQuery = new HashMap<>();
-        graphQlQuery.put("query", "{repository(owner: \"" + this.repoOwner + "\", name:\"" + this.repoName + "\") {" +
-                "defaultBranchRef {" +
-                "target {" +
-                "... on Commit {" +
-                "history (last:100, before: \"" + this.cursor + "\") {" +
-                "nodes {" +
-                "committedDate\n" +
-                "additions\n" +
-                "deletions\n" +
-                "changedFiles\n" +
-                "author {" +
-                "email\n" +
-                "name\n" +
-                "}" +
-                "}" +
-                "}" +
-                "}" +
-                "}" +
-                "}" +
-                "}}");
-
-        String responseJson = this.webClient.post()
-                .body(BodyInserters.fromObject(graphQlQuery))
-                .exchange()
-                .block()
-                .bodyToMono(String.class)
-                .block();
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        Optional<JsonNode> commits = null;
-        try {
-            commits = Optional.ofNullable(mapper.readTree(responseJson))
-                    .map(resp -> resp.get("data"))
-                    .map(data -> data.get("repository"))
-                    .map(repo -> repo.get("defaultBranchRef"))
-                    .map(branch -> branch.get("target"))
-                    .map(tag -> tag.get("history"))
-                    .map(hist -> hist.get("nodes"));
-        } catch (IOException e) {
-            Thread.currentThread().interrupt();
-        }
-
-        commits.get().forEach(entity->{
-            GithubCommitDTO githubCommitDTO = new GithubCommitDTO();
-            githubCommitDTO.setRepoOwner(repoOwner);
-            githubCommitDTO.setRepoName(repoName);
-            githubCommitDTO.setAdditions(Integer.parseInt(entity.get("additions").toString()));
-            githubCommitDTO.setDeletions(Integer.parseInt(entity.get("deletions").toString()));
-            githubCommitDTO.setCommittedDate(entity.get("committedDate"));
-            githubCommitDTO.setAuthor(Optional.ofNullable(entity.get("author")));
-
-            synchronized (lock) {
-                githubCommitService.save(githubCommitDTO);
-            }
-        });
-    }
-}
-
-class GithubIssueLoaderThread extends Thread {
-
-    private final String token = System.getenv("PVS_GITHUB_TOKEN");
-    private static Object lock = new Object();
-    static final Logger logger = LogManager.getLogger(GithubIssueLoaderThread.class.getName());
-
-    private List<GithubIssueDTO> githubIssueDTOList;
-    private String repoOwner;
-    private String repoName;
-    private WebClient webClient;
-    private int page;
-
-
-    GithubIssueLoaderThread(List<GithubIssueDTO> githubIssueDTOList, String repoOwner, String repoName, int page) {
-        this.webClient = WebClient.builder().baseUrl("https://api.github.com/repos")
-                .defaultHeader("Authorization", "Bearer " + token )
-                .build();
-        this.githubIssueDTOList = githubIssueDTOList;
-        this.repoOwner = repoOwner;
-        this.repoName = repoName;
-        this.page = page;
-    }
-
-    @Override
-    public void run() {
-        String responseJson = this.webClient.get()
-                .uri("/"+ this.repoOwner +"/"+ this.repoName +"/issues?page="+ this.page +"&per_page=100&state=all")
-                .exchange()
-                .block()
-                .bodyToMono(String.class)
-                .block();
-        ObjectMapper mapper = new ObjectMapper();
-
-        Optional<JsonNode> issueList = null;
-        try {
-            issueList = Optional.ofNullable(mapper.readTree(responseJson));
-        } catch (IOException e) {
-            Thread.currentThread().interrupt();
-        }
-
-
-        issueList.get().forEach(entity->{
-            GithubIssueDTO githubIssueDTO = new GithubIssueDTO();
-            githubIssueDTO.setRepoOwner(repoOwner);
-            githubIssueDTO.setRepoName(repoName);
-            githubIssueDTO.setCreatedAt(entity.get("created_at"));
-            githubIssueDTO.setClosedAt(entity.get("closed_at"));
-
-            synchronized (lock) {
-                githubIssueDTOList.add(githubIssueDTO);
-            }
-        });
-    }
-}

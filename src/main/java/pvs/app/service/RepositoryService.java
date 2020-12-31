@@ -29,7 +29,6 @@ public class RepositoryService {
             return false;
         }
         String targetURL = url.replace("github.com", "api.github.com/repos");
-        logger.debug(targetURL);
 
         AtomicBoolean result = new AtomicBoolean(false);
         this.webClient
@@ -40,14 +39,14 @@ public class RepositoryService {
                 result.set(clientResponse.statusCode().equals(HttpStatus.OK))
             )
             .block();
-        logger.debug(result.get());
         return result.get();
     }
 
     public boolean checkSonarURL(String url) {
-        if(!url.contains("http://140.124.181.143/")){
+        if(!url.contains("140.124.181.143")){
             return false;
         }
+
         String targetURL = url.replace("dashboard?id", "api/components/show?component");
         AtomicBoolean result = new AtomicBoolean(false);
 

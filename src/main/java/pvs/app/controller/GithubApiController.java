@@ -32,7 +32,6 @@ public class GithubApiController {
         this.githubCommitService = githubCommitService;
     }
 
-
     @SneakyThrows
     @PostMapping("/commits/{repoOwner}/{repoName}")
     public ResponseEntity<String> postCommits(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException {

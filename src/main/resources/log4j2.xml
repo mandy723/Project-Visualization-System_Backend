@@ -24,7 +24,7 @@
         <Logger name="pvs.app.dto.GithubCommitDTO" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
-        <Logger name="pvs.app.service.GithubIssueLoaderThread" level="debug" additivity="false">
+        <Logger name="pvs.app.service.thread.GithubIssueLoaderThread" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
         <Logger name="pvs.app.service.SonarApiService" level="debug" additivity="false">

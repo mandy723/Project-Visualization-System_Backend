@@ -60,6 +60,8 @@ public class ProjectController {
             projectService.create(projectDTO);
             return ResponseEntity.status(HttpStatus.OK).body("你成功了");
         }catch(Exception e){
+            logger.debug(e.toString());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你去死吧");
         }
     }
@@ -77,6 +79,7 @@ public class ProjectController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你連URL都不會打嗎");
             }
         }catch(Exception e){
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你去死吧");
         }
     }

@@ -2,9 +2,9 @@ server:
   port: 9100
   servlet:
     context-path: /pvs-api
-
-logging:
-  config: classpath:log4j2.xml
+#
+#logging:
+#  config: classpath:log4j2.xml
 
 spring:
   profiles:
