@@ -43,17 +43,17 @@ public class RepositoryServiceTest {
         Assert.assertFalse(exist);
     }
 
-    @Test
-    public void checkSonarURL_thenReturnTrue() throws InterruptedException {
-        mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .setBody("{}")
-                .addHeader("Content-Type", "application/json")
-        );
-        boolean exist = repositoryService.checkSonarURL("http://140.124.181.143:9002/dashboard");
-        TimeUnit.SECONDS.sleep(1);
-        Assert.assertTrue(exist);
-    }
+//    @Test
+//    public void checkSonarURL_thenReturnTrue() throws InterruptedException {
+//        mockWebServer.enqueue(new MockResponse()
+//                .setResponseCode(200)
+//                .setBody("{}")
+//                .addHeader("Content-Type", "application/json")
+//        );
+//        boolean exist = repositoryService.checkSonarURL("http://140.124.181.143:9002/dashboard");
+//        TimeUnit.SECONDS.sleep(1);
+//        Assert.assertTrue(exist);
+//    }
 
     @Test
     public void checkGithubURL_thenReturnFalse() throws InterruptedException {
@@ -66,16 +66,16 @@ public class RepositoryServiceTest {
         Assert.assertFalse(exist);
     }
 
-    @Test
-    public void checkGithubURL_thenReturnTrue() throws InterruptedException {
-        mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .setBody("{}")
-                .addHeader("Content-Type", "application/json")
-        );
-        boolean exist = repositoryService.checkGithubURL("https://github.com/imper0502/pvs-spring-boot");
-        TimeUnit.SECONDS.sleep(1);
-        Assert.assertTrue(exist);
-    }
+//    @Test
+//    public void checkGithubURL_thenReturnTrue() throws InterruptedException {
+//        mockWebServer.enqueue(new MockResponse()
+//                .setResponseCode(200)
+//                .setBody("{}")
+//                .addHeader("Content-Type", "application/json")
+//        );
+//        boolean exist = repositoryService.checkGithubURL("https://github.com/imper0502/pvs-spring-boot");
+//        TimeUnit.SECONDS.sleep(1);
+//        Assert.assertTrue(exist);
+//    }
 
 }
