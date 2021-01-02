@@ -14,11 +14,14 @@ public class RoleService {
         this.roleDAO = roleDAO;
     }
 
-    public Role save(RoleDTO roleDTO) {
+    public RoleDTO save(RoleDTO roleDTO) {
         Role role = new Role();
         role.setName(roleDTO.getName());
 
-        return roleDAO.save(role);
+        Role savedRole = roleDAO.save(role);
+        RoleDTO savedRoleDTO = new RoleDTO();
+        savedRoleDTO.setName(savedRole.getName());
+        return savedRoleDTO;
     }
 
     public Role getByName(String name) {

@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
@@ -61,7 +62,7 @@ public class GithubCommitServiceTest {
     }
 
     @Test
-    public void get_all_commits() {
+    public void getAllCommits() {
         //context
         when(mockGithubCommitDAO.findByRepoOwnerAndRepoName("facebook", "react"))
                 .thenReturn(githubCommits);
@@ -75,7 +76,7 @@ public class GithubCommitServiceTest {
     }
 
     @Test
-    public void get_last_commit() throws ParseException {
+    public void getLastCommit_isExist() throws ParseException {
         //context
         when(mockGithubCommitDAO.findFirstByRepoOwnerAndRepoNameOrderByCommittedDateDesc("facebook", "react"))
                 .thenReturn(githubCommits.get(1));
@@ -89,6 +90,19 @@ public class GithubCommitServiceTest {
         //then
         assertEquals(dateFormat.parse("2020-12-21 22:22:22"), githubCommit.getCommittedDate());
         verify(mockGithubCommitDAO, times(1)).findFirstByRepoOwnerAndRepoNameOrderByCommittedDateDesc("facebook", "react");
+    }
+
+    @Test
+    public void getLastCommit_isNotExist() throws ParseException {
+        //context
+        when(mockGithubCommitDAO.findFirstByRepoOwnerAndRepoNameOrderByCommittedDateDesc("facebook", "react"))
+                .thenReturn(null);
+
+        //when
+        GithubCommitDTO githubCommit = githubCommitService.getLastCommit("facebook", "react");
+
+        //then
+        assertNull(githubCommit);
     }
 
     @Test

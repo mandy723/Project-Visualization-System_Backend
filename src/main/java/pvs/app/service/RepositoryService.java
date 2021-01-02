@@ -5,9 +5,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
@@ -25,30 +25,22 @@ public class RepositoryService {
                 .build();
     }
 
-    public boolean checkGithubURL(String url) {
+    public boolean checkGithubURL(String url) throws InterruptedException {
         if(!url.contains("github.com")){
             return false;
         }
         String targetURL = url.replace("github.com", "api.github.com/repos");
-
-        String responseJson = this.webClient.get()
-                .uri(targetURL)
-                .exchange()
-                .block()
-                .bodyToMono(String.class)
-                .block();
-        System.out.println(responseJson);
-
         AtomicBoolean result = new AtomicBoolean(false);
+
         this.webClient
             .get()
             .uri(targetURL)
             .exchange()
             .doAfterSuccessOrError((clientResponse, throwable) ->
-                            System.out.println(clientResponse.statusCode())
-//                result.set(clientResponse.statusCode().equals(HttpStatus.OK))
+                result.set(clientResponse.statusCode().equals(HttpStatus.OK))
             )
             .block();
+        TimeUnit.SECONDS.sleep(1);
         return result.get();
     }
 

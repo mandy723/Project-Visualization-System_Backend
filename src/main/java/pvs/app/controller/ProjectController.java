@@ -32,7 +32,7 @@ public class ProjectController {
     }
 
     @GetMapping("/repository/github/check")
-    public ResponseEntity<String> checkGithubURL(@RequestParam("url") String url) {
+    public ResponseEntity<String> checkGithubURL(@RequestParam("url") String url) throws InterruptedException {
         //我在檢查
         if(repositoryService.checkGithubURL(url)) {
             return ResponseEntity.status(HttpStatus.OK).body("你成功了");

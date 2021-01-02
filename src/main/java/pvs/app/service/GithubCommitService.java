@@ -45,7 +45,6 @@ public class GithubCommitService {
     public GithubCommitDTO getLastCommit(String repoOwner, String repoName) {
         GithubCommit githubCommit = githubCommitDAO.findFirstByRepoOwnerAndRepoNameOrderByCommittedDateDesc(repoOwner, repoName);
         if(null == githubCommit) {
-            logger.debug("NONONONONONONONONONONOONONONONO");
             return null;
         }
         GithubCommitDTO dto = modelMapper.map(githubCommit, GithubCommitDTO.class);
