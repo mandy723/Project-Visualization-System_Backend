@@ -2,6 +2,11 @@ server:
   port: 9100
   servlet:
     context-path: /pvs-api
+
+webClient:
+  baseUrl:
+    sonar: "http://140.124.181.143:9002/api"
+    test: ""
 #
 #logging:
 #  config: classpath:log4j2.xml
@@ -26,3 +31,4 @@ spring:
       ddl-auto: update
   jackson:
     time-zone: Asia/Taipei
+

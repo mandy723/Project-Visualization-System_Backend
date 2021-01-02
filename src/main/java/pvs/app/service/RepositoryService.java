@@ -2,6 +2,7 @@ package pvs.app.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -14,12 +15,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RepositoryService {
     private final WebClient webClient;
 
-    private String token = System.getenv("PVS_GITHUB_TOKEN");
+    private final String token = System.getenv("PVS_GITHUB_TOKEN");
 
     static final Logger logger = LogManager.getLogger(RepositoryService.class.getName());
 
-    public RepositoryService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder
+    public RepositoryService(WebClient.Builder webClientBuilder, @Value("${webClient.baseUrl.test}") String baseUrl) {
+        this.webClient = webClientBuilder.baseUrl(baseUrl)
                 .defaultHeader("Authorization", "Bearer " + token )
                 .build();
     }
@@ -30,13 +31,22 @@ public class RepositoryService {
         }
         String targetURL = url.replace("github.com", "api.github.com/repos");
 
+        String responseJson = this.webClient.get()
+                .uri(targetURL)
+                .exchange()
+                .block()
+                .bodyToMono(String.class)
+                .block();
+        System.out.println(responseJson);
+
         AtomicBoolean result = new AtomicBoolean(false);
         this.webClient
             .get()
             .uri(targetURL)
             .exchange()
             .doAfterSuccessOrError((clientResponse, throwable) ->
-                result.set(clientResponse.statusCode().equals(HttpStatus.OK))
+                            System.out.println(clientResponse.statusCode())
+//                result.set(clientResponse.statusCode().equals(HttpStatus.OK))
             )
             .block();
         return result.get();

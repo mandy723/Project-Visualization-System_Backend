@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import pvs.app.dto.BugDTO;
@@ -26,8 +27,8 @@ public class SonarApiService {
 
     private String token = System.getenv("PVS_SONAR_TOKEN");
 
-    public SonarApiService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://140.124.181.143:9002/api")
+    public SonarApiService(WebClient.Builder webClientBuilder, @Value("${webClient.baseUrl.sonar}") String baseUrl) {
+        this.webClient = webClientBuilder.baseUrl(baseUrl)
                 .defaultHeader("Authorization", "Bearer " + token )
                 .build();
     }
