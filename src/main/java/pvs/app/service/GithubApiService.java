@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import pvs.app.dao.GithubCommitDAO;
 import pvs.app.dto.GithubIssueDTO;
 import pvs.app.service.thread.GithubCommitLoaderThread;
 import pvs.app.service.thread.GithubIssueLoaderThread;
@@ -35,11 +36,6 @@ public class GithubApiService {
                 .defaultHeader("Authorization", "Bearer " + token )
                 .build();
     }
-//
-//    public GithubApiService(WebClient.Builder builder, String url, GithubCommitService githubCommitService) {
-//        this.githubCommitService = githubCommitService;
-//        this.webClient = builder.baseUrl(url).defaultHeader("Authorization", "Bearer " + token ).build();
-//    }
 
     private String dateToISO8601(Date date) {
         SimpleDateFormat sdf;

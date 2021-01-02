@@ -33,7 +33,7 @@ public class GithubApiController {
     }
 
     @SneakyThrows
-    @PostMapping("/commits/{repoOwner}/{repoName}")
+    @PostMapping("/github/commits/{repoOwner}/{repoName}")
     public ResponseEntity<String> postCommits(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException {
         Date lastUpdate;
         GithubCommitDTO githubCommitDTO = githubCommitService.getLastCommit(repoOwner, repoName);
@@ -49,7 +49,7 @@ public class GithubApiController {
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
 
-    @GetMapping("/commits/{repoOwner}/{repoName}")
+    @GetMapping("/github/commits/{repoOwner}/{repoName}")
     public ResponseEntity<String> getCommits(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException {
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -62,7 +62,7 @@ public class GithubApiController {
                 .body(githubCommitDTOsJson);
     }
 
-    @GetMapping("/issues/{repoOwner}/{repoName}")
+    @GetMapping("/github/issues/{repoOwner}/{repoName}")
     public ResponseEntity<String> getIssues(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException, InterruptedException {
         ObjectMapper objectMapper = new ObjectMapper();
 

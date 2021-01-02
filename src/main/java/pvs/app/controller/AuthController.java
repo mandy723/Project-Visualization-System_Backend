@@ -4,9 +4,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import pvs.app.dto.MemberDTO;
 import pvs.app.service.AuthService;
-import pvs.app.service.ProjectService;
 
 @RestController
 public class AuthController {
@@ -19,9 +20,9 @@ public class AuthController {
      * 登录
      */
     @PostMapping(value = "/auth/login")
-    public String login( String username,String password ) {
+    public String login( @RequestBody MemberDTO memberDTO ) {
         // 登录成功会返回Token给用户
-        String token = authService.login( username, password );
+        String token = authService.login( memberDTO.getUsername(), memberDTO.getPassword() );
         logger.debug(token);
         return token;
     }
