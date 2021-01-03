@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import pvs.app.dto.GithubCommitDTO;
@@ -43,23 +42,23 @@ public class GithubCommitLoaderThread extends Thread {
         Map<String, Object> graphQlQuery = new HashMap<>();
         graphQlQuery.put("query", "{repository(owner: \"" + this.repoOwner + "\", name:\"" + this.repoName + "\") {" +
                 "defaultBranchRef {" +
-                "target {" +
-                "... on Commit {" +
-                "history (last:100, before: \"" + this.cursor + "\") {" +
-                "nodes {" +
-                "committedDate\n" +
-                "additions\n" +
-                "deletions\n" +
-                "changedFiles\n" +
-                "author {" +
-                "email\n" +
-                "name\n" +
-                "}" +
-                "}" +
-                "}" +
-                "}" +
-                "}" +
-                "}" +
+                    "target {" +
+                        "... on Commit {" +
+                            "history (last:100, before: \"" + this.cursor + "\") {" +
+                                "nodes {" +
+                                    "committedDate\n" +
+                                        "additions\n" +
+                                        "deletions\n" +
+                                        "changedFiles\n" +
+                                        "author {" +
+                                            "email\n" +
+                                            "name\n" +
+                                        "}" +
+                                    "}" +
+                                "}" +
+                            "}" +
+                        "}" +
+                    "}" +
                 "}}");
 
         String responseJson = this.webClient.post()

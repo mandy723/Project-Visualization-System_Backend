@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import pvs.app.dao.GithubCommitDAO;
 import pvs.app.dto.GithubIssueDTO;
 import pvs.app.service.thread.GithubCommitLoaderThread;
 import pvs.app.service.thread.GithubIssueLoaderThread;
@@ -30,9 +30,9 @@ public class GithubApiService {
 
     private GithubCommitService githubCommitService;
 
-    public GithubApiService(WebClient.Builder webClientBuilder, GithubCommitService githubCommitService) {
+    public GithubApiService(WebClient.Builder webClientBuilder, @Value("${webClient.baseUrl.github}") String baseUrl, GithubCommitService githubCommitService) {
         this.githubCommitService = githubCommitService;
-        this.webClient = webClientBuilder.baseUrl("https://api.github.com/graphql")
+        this.webClient = webClientBuilder.baseUrl(baseUrl)
                 .defaultHeader("Authorization", "Bearer " + token )
                 .build();
     }
@@ -183,9 +183,6 @@ public class GithubApiService {
                 .block()
                 .bodyToMono(String.class)
                 .block();
-
-        logger.debug("responseJson ====");
-        logger.debug(responseJson);
 
         ObjectMapper mapper = new ObjectMapper();
         Optional<JsonNode> avatar = Optional.ofNullable(mapper.readTree(responseJson))

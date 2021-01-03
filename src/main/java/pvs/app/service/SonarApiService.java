@@ -54,8 +54,6 @@ public class SonarApiService {
             for(final JsonNode jsonNode : coverageArrayNode) {
                 DateTimeFormatter isoParser = ISODateTimeFormat.dateTimeNoMillis().withLocale(Locale.TAIWAN);
 
-                logger.debug(jsonNode);
-
                 Date date =
                         isoParser.parseDateTime(jsonNode.get("date").textValue().replace("\"", ""))
                                  .toDate();

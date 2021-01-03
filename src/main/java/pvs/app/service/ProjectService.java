@@ -11,9 +11,7 @@ import pvs.app.entity.Repository;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class ProjectService {
@@ -53,8 +51,6 @@ public class ProjectService {
     public List<ResponseProjectDTO> getMemberProjects(Long memberId) {
         List<Project> projectList = projectDAO.findByMemberId(memberId);
         List<ResponseProjectDTO> projectDTOList = new ArrayList<>();
-        logger.debug(memberId);
-        logger.debug(projectList);
 
         for (Project project:projectList) {
             ResponseProjectDTO projectDTO = new ResponseProjectDTO();

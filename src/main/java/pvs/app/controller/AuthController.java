@@ -22,20 +22,6 @@ public class AuthController {
     @PostMapping(value = "/auth/login")
     public String login( @RequestBody MemberDTO memberDTO ) {
         // 登录成功会返回Token给用户
-        String token = authService.login( memberDTO.getUsername(), memberDTO.getPassword() );
-        logger.debug(token);
-        return token;
+        return authService.login( memberDTO.getUsername(), memberDTO.getPassword() );
     }
-
-    @PostMapping(value = "/user/hi")
-    public String userHi( String name ) {
-        return "hi " + name + " , you have 'user' role";
-    }
-
-    @PostMapping(value = "/admin/hi")
-    public String adminHi( String name ) {
-        return "hi " + name + " , you have 'admin' role";
-    }
-
-
 }

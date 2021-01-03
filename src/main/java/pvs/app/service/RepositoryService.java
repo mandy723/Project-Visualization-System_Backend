@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
@@ -25,7 +24,7 @@ public class RepositoryService {
                 .build();
     }
 
-    public boolean checkGithubURL(String url) throws InterruptedException {
+    public boolean checkGithubURL(String url) {
         if(!url.contains("github.com")){
             return false;
         }
@@ -33,14 +32,14 @@ public class RepositoryService {
         AtomicBoolean result = new AtomicBoolean(false);
 
         this.webClient
-            .get()
-            .uri(targetURL)
-            .exchange()
-            .doAfterSuccessOrError((clientResponse, throwable) ->
-                result.set(clientResponse.statusCode().equals(HttpStatus.OK))
-            )
-            .block();
-        TimeUnit.SECONDS.sleep(1);
+                .get()
+                .uri(targetURL)
+                .exchange()
+                .doOnSuccess(clientResponse ->
+                    result.set(clientResponse.statusCode().equals(HttpStatus.OK))
+                )
+//                .doOnError(throwable -> System.out.println(throwable))
+                .block();
         return result.get();
     }
 
@@ -53,13 +52,14 @@ public class RepositoryService {
         AtomicBoolean result = new AtomicBoolean(false);
 
         this.webClient
-            .get()
-            .uri(targetURL)
-            .exchange()
-            .doAfterSuccessOrError((clientResponse, throwable) ->
-                    result.set(clientResponse.statusCode().equals(HttpStatus.OK))
-            )
-            .block();
+                .get()
+                .uri(targetURL)
+                .exchange()
+                .doOnSuccess(clientResponse ->
+                        result.set(clientResponse.statusCode().equals(HttpStatus.OK))
+                )
+//                .doOnError(throwable -> System.out.println(throwable))
+                .block();
         return result.get();
     }
 }

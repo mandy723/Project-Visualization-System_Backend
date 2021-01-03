@@ -6,6 +6,7 @@ server:
 webClient:
   baseUrl:
     sonar: "http://140.124.181.143:9002/api"
+    github: "https://api.github.com/graphql"
     test: ""
 #
 #logging:

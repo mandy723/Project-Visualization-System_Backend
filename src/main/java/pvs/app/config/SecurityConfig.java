@@ -32,34 +32,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private UserDetailsService userDetailsService;
 
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    public void configureGlobal(AuthenticationManagerBuilder auth) {
 
         //校驗使用者
-        auth.userDetailsService( userDetailsService ).passwordEncoder( new PasswordEncoder() {
-            //對密碼進行加密
-            @Override
-            public String encode(CharSequence charSequence) {
-                return DigestUtils.md5DigestAsHex(charSequence.toString().getBytes());
-            }
-            //對密碼進行判斷匹配
-            @Override
-            public boolean matches(CharSequence charSequence, String s) {
-                String encode = DigestUtils.md5DigestAsHex(charSequence.toString().getBytes());
-                logger.debug("s: "+s);
-                logger.debug("charSequence: "+charSequence.toString());
-                logger.debug("encode: "+encode);
-                logger.debug("equals: "+s.equals(encode));
+        try {
+            auth.userDetailsService( userDetailsService ).passwordEncoder( new PasswordEncoder() {
+                //對密碼進行加密
+                @Override
+                public String encode(CharSequence charSequence) {
+                    return DigestUtils.md5DigestAsHex(charSequence.toString().getBytes());
+                }
+                //對密碼進行判斷匹配
+                @Override
+                public boolean matches(CharSequence charSequence, String s) {
+                    String encode = DigestUtils.md5DigestAsHex(charSequence.toString().getBytes());
 
-                return s.equals( encode );
-            }
-        } );
-
+                    return s.equals( encode );
+                }
+            } );
+        } catch (Exception e) {
+            logger.debug(e);
+            e.printStackTrace();
+        }
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        logger.debug(http);
-
         http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
                 .and().csrf().disable()
                 //因為使用JWT，所以不需要HttpSession
@@ -71,9 +69,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/auth/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/member").permitAll()
                 .antMatchers("/project/**", "/github/**", "/sonar/**").hasAuthority("USER");
-//                .antMatchers().hasAuthority("ADMIN");
-        //其他介面全部接受驗證
-//                .anyRequest().authenticated();
 
         //使用自定義的 Token過濾器 驗證請求的Token是否合法
         http.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);

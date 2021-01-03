@@ -1,6 +1,5 @@
 package pvs.app.service;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import pvs.app.entity.Member;

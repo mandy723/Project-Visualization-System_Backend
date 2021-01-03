@@ -1,6 +1,5 @@
 package pvs.app.controller;
 
-import org.apache.coyote.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -20,6 +19,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class ProjectController {
+    private static final String URL_INVALID_MESSAGE = "你連URL都不會打嗎";
 
     static final Logger logger = LogManager.getLogger(ProjectController.class.getName());
 
@@ -32,13 +32,13 @@ public class ProjectController {
     }
 
     @GetMapping("/repository/github/check")
-    public ResponseEntity<String> checkGithubURL(@RequestParam("url") String url) throws InterruptedException {
+    public ResponseEntity<String> checkGithubURL(@RequestParam("url") String url) {
         //我在檢查
         if(repositoryService.checkGithubURL(url)) {
             return ResponseEntity.status(HttpStatus.OK).body("你成功了");
         }
         else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你連URL都不會打嗎");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(URL_INVALID_MESSAGE);
         }
     }
 
@@ -49,7 +49,7 @@ public class ProjectController {
             return ResponseEntity.status(HttpStatus.OK).body("你成功了");
         }
         else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你連URL都不會打嗎");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(URL_INVALID_MESSAGE);
         }
     }
 
@@ -76,7 +76,7 @@ public class ProjectController {
                 return ResponseEntity.status(HttpStatus.OK).body("你成功了");
             }
             else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你連URL都不會打嗎");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(URL_INVALID_MESSAGE);
             }
         }catch(Exception e){
             e.printStackTrace();
@@ -97,7 +97,7 @@ public class ProjectController {
                 return ResponseEntity.status(HttpStatus.OK).body("你成功了");
             }
             else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你連URL都不會打嗎");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(URL_INVALID_MESSAGE);
             }
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你去死吧");

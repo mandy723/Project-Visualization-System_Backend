@@ -31,9 +31,8 @@ public class SonarApiController {
     }
 
     @GetMapping("/sonar/{component}/coverage")
-    public ResponseEntity<String> getCoverage(@PathVariable("component") String component) throws IOException, InterruptedException {
+    public ResponseEntity<String> getCoverage(@PathVariable("component") String component) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        logger.debug("coverage");
         List<CodeCoverageDTO> coverages = sonarApiService.getSonarCodeCoverage(component);
 
         String coverageString = objectMapper.writeValueAsString(coverages);
@@ -43,9 +42,8 @@ public class SonarApiController {
     }
 
     @GetMapping("/sonar/{component}/bug")
-    public ResponseEntity<String> getBug(@PathVariable("component") String component) throws IOException, InterruptedException {
+    public ResponseEntity<String> getBug(@PathVariable("component") String component) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        logger.debug("bug");
         List<BugDTO> bugList = sonarApiService.getSonarBug(component);
 
         String bugListString = objectMapper.writeValueAsString(bugList);
@@ -55,9 +53,8 @@ public class SonarApiController {
     }
 
     @GetMapping("/sonar/{component}/code_smell")
-    public ResponseEntity<String> getCodeSmell(@PathVariable("component") String component) throws IOException, InterruptedException {
+    public ResponseEntity<String> getCodeSmell(@PathVariable("component") String component) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        logger.debug("code smell");
         List<CodeSmellDTO> codeSmellList = sonarApiService.getSonarCodeSmell(component);
 
         String codeSmellListString = objectMapper.writeValueAsString(codeSmellList);
@@ -67,9 +64,8 @@ public class SonarApiController {
     }
 
     @GetMapping("/sonar/{component}/duplication")
-    public ResponseEntity<String> getDuplication(@PathVariable("component") String component) throws IOException, InterruptedException {
+    public ResponseEntity<String> getDuplication(@PathVariable("component") String component) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        logger.debug("duplication");
         List<DuplicationDTO> duplicationList = sonarApiService.getDuplication(component);
 
         String duplicationListString = objectMapper.writeValueAsString(duplicationList);
