@@ -24,6 +24,7 @@ public class RoleDAOIntegrationTest {
     private RoleDAO roleDAO;
 
     Role userRole;
+
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
