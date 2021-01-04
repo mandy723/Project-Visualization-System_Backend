@@ -45,13 +45,13 @@ public class GithubCommitLoaderThread extends Thread {
                         "... on Commit {" +
                             "history (last:100, before: \"" + this.cursor + "\") {" +
                                 "nodes {" +
-                                    "committedDate" +
-                                        "additions" +
-                                        "deletions" +
-                                        "changedFiles" +
+                                        "committedDate\n" +
+                                        "additions\n" +
+                                        "deletions\n" +
+                                        "changedFiles\n" +
                                         "author {" +
-                                            "email" +
-                                            "name" +
+                                            "email\n" +
+                                            "name\n" +
                                         "}" +
                                     "}" +
                                 "}" +
