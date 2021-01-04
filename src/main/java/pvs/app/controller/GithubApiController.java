@@ -98,7 +98,7 @@ public class GithubApiController {
 
         try {
             githubIssueDTOs = githubApiService.getIssuesFromGithub(repoOwner, repoName);
-            if(githubIssueDTOs.isEmpty()) {
+            if(null == githubIssueDTOs) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("cannot get issue data");
             }

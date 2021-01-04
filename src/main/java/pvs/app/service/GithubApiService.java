@@ -176,6 +176,8 @@ public class GithubApiService {
                     thread.join();
                 }
             }
+        } else {
+            return null;
         }
         return githubIssueDTOList;
     }
