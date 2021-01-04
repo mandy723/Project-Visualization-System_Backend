@@ -36,7 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         //校驗使用者
         try {
-            auth.userDetailsService( userDetailsService ).passwordEncoder( new PasswordEncoder() {
+            auth.userDetailsService(userDetailsService).passwordEncoder( new PasswordEncoder() {
                 //對密碼進行加密
                 @Override
                 public String encode(CharSequence charSequence) {

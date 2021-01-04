@@ -38,7 +38,6 @@ public class RepositoryService {
                 .doOnSuccess(clientResponse ->
                     result.set(clientResponse.statusCode().equals(HttpStatus.OK))
                 )
-//                .doOnError(throwable -> System.out.println(throwable))
                 .block();
         return result.get();
     }
@@ -58,7 +57,6 @@ public class RepositoryService {
                 .doOnSuccess(clientResponse ->
                         result.set(clientResponse.statusCode().equals(HttpStatus.OK))
                 )
-//                .doOnError(throwable -> System.out.println(throwable))
                 .block();
         return result.get();
     }

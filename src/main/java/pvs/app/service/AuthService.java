@@ -17,11 +17,11 @@ public class AuthService {
 
     static final Logger logger = LogManager.getLogger(AuthService.class.getName());
 
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
-    private JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenUtil jwtTokenUtil;
 
     AuthService(AuthenticationManager authenticationManager,
                 @Qualifier("userDetailsServiceImpl")UserDetailsService userDetailsService,
@@ -35,7 +35,7 @@ public class AuthService {
         UsernamePasswordAuthenticationToken upToken = new UsernamePasswordAuthenticationToken( username, password );
         Authentication authentication = authenticationManager.authenticate(upToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserDetails userDetails = userDetailsService.loadUserByUsername( username );
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         return jwtTokenUtil.generateToken(userDetails);
     }
 }

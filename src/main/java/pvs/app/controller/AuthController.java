@@ -22,6 +22,6 @@ public class AuthController {
     @PostMapping(value = "/auth/login")
     public String login( @RequestBody MemberDTO memberDTO ) {
         // 登录成功会返回Token给用户
-        return authService.login( memberDTO.getUsername(), memberDTO.getPassword() );
+        return authService.login(memberDTO.getUsername(), memberDTO.getPassword());
     }
 }

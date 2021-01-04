@@ -1,9 +1,11 @@
 package pvs.app.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,9 @@ import java.util.List;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class GithubApiController {
 
+    @Value("${message.exception}")
+    private String EXCEPTION_MESSAGE;
+    
     static final Logger logger = LogManager.getLogger(GithubApiController.class.getName());
 
     private final GithubApiService githubApiService;
@@ -34,7 +39,8 @@ public class GithubApiController {
 
     @SneakyThrows
     @PostMapping("/github/commits/{repoOwner}/{repoName}")
-    public ResponseEntity<String> postCommits(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException {
+    public ResponseEntity<String> postCommits(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) {
+        boolean callAPISuccess;
         Date lastUpdate;
         GithubCommitDTO githubCommitDTO = githubCommitService.getLastCommit(repoOwner, repoName);
         if (null == githubCommitDTO) {
@@ -45,31 +51,74 @@ public class GithubApiController {
             lastUpdate = githubCommitDTO.getCommittedDate();
         }
 
-        githubApiService.getCommitsFromGithub(repoOwner, repoName, lastUpdate);
-        return ResponseEntity.status(HttpStatus.OK).body("");
+        try{
+            callAPISuccess = githubApiService.getCommitsFromGithub(repoOwner, repoName, lastUpdate);
+        } catch (InterruptedException | IOException e) {
+            Thread.currentThread().interrupt();
+            e.printStackTrace();
+            logger.debug(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(EXCEPTION_MESSAGE);
+        }
+
+        if(callAPISuccess) {
+            return ResponseEntity.status(HttpStatus.OK).body("success get commit data and save to database");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("cannot get commit data");
+        }
     }
 
     @GetMapping("/github/commits/{repoOwner}/{repoName}")
-    public ResponseEntity<String> getCommits(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException {
+    public ResponseEntity<String> getCommits(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         List<GithubCommitDTO> githubCommitDTOs = githubCommitService.getAllCommits(repoOwner, repoName);
 
-        String githubCommitDTOsJson = objectMapper.writeValueAsString(githubCommitDTOs);
+        String githubCommitDTOsJson;
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(githubCommitDTOsJson);
+        try {
+            githubCommitDTOsJson = objectMapper.writeValueAsString(githubCommitDTOs);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(githubCommitDTOsJson);
+        } catch (JsonProcessingException e) {
+            logger.debug(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(EXCEPTION_MESSAGE);
+        }
     }
 
     @GetMapping("/github/issues/{repoOwner}/{repoName}")
-    public ResponseEntity<String> getIssues(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) throws IOException, InterruptedException {
+    public ResponseEntity<String> getIssues(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName){
         ObjectMapper objectMapper = new ObjectMapper();
 
-        List<GithubIssueDTO> githubIssueDTOs = githubApiService.getIssuesFromGithub(repoOwner, repoName);
-        String githubIssueDTOsJson = objectMapper.writeValueAsString(githubIssueDTOs);
+        List<GithubIssueDTO> githubIssueDTOs;
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(githubIssueDTOsJson);
+        try {
+            githubIssueDTOs = githubApiService.getIssuesFromGithub(repoOwner, repoName);
+            if(githubIssueDTOs.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("cannot get issue data");
+            }
+        } catch (InterruptedException | IOException e) {
+            logger.debug(e.getMessage());
+            e.printStackTrace();
+            Thread.currentThread().interrupt();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(EXCEPTION_MESSAGE);
+        }
+
+        try {
+            String githubIssueDTOsJson = objectMapper.writeValueAsString(githubIssueDTOs);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(githubIssueDTOsJson);
+        } catch (IOException e) {
+            logger.debug(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(EXCEPTION_MESSAGE);
+        }
     }
 }

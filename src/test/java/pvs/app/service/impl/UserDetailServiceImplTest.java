@@ -13,14 +13,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.reactive.function.client.WebClient;
 import pvs.app.Application;
 import pvs.app.dao.MemberDAO;
 import pvs.app.entity.Member;
 import pvs.app.entity.Role;
-import pvs.app.service.RepositoryService;
 
 import java.io.IOException;
 import java.util.Set;
@@ -39,7 +38,7 @@ public class UserDetailServiceImplTest {
     private Member member;
 
     @Before
-    public void setup() throws IOException {
+    public void setup() {
         this.userDetailsServiceImpl = new UserDetailsServiceImpl(mockMemberDAO);
 
         member = new Member();
@@ -54,12 +53,22 @@ public class UserDetailServiceImplTest {
     }
 
     @Test
-    public void loadUserByUsername() {
+    public void loadUserByUsername_found() {
         //given
         Mockito.when(mockMemberDAO.findByUsername("test")).thenReturn(member);
         //when
         UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername("test");
         //then
         Assert.assertEquals(member, userDetails);
+    }
+
+    @Test
+    public void loadUserByUsername_notFound() {
+        //given
+        Mockito.when(mockMemberDAO.findByUsername("test")).thenThrow(new UsernameNotFoundException("not found"));
+        //when
+        UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername("notFound");
+        //then
+        Assert.assertNull(userDetails);
     }
 }

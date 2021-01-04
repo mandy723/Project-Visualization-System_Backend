@@ -1,8 +1,10 @@
 package pvs.app.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,19 @@ import java.util.List;
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class SonarApiController {
+
+    @Value("${message.exception}")
+    private String EXCEPTION_MESSAGE;
+
+    @Value("${message.invalid.url}")
+    private String URL_INVALID_MESSAGE;
+
+    @Value("${message.success}")
+    private String SUCCESS_MESSAGE;
+
+    @Value("${message.fail}")
+    private String FAIL_MESSAGE;
+
     static final Logger logger = LogManager.getLogger(SonarApiController.class.getName());
     private final SonarApiService sonarApiService;
 
@@ -31,46 +46,90 @@ public class SonarApiController {
     }
 
     @GetMapping("/sonar/{component}/coverage")
-    public ResponseEntity<String> getCoverage(@PathVariable("component") String component) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<CodeCoverageDTO> coverages = sonarApiService.getSonarCodeCoverage(component);
+    public ResponseEntity<String> getCoverage(@PathVariable("component") String component) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<CodeCoverageDTO> coverages = sonarApiService.getSonarCodeCoverage(component);
+            if(!coverages.isEmpty()) {
+                String coverageString = objectMapper.writeValueAsString(coverages);
 
-        String coverageString = objectMapper.writeValueAsString(coverages);
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(coverageString);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(coverageString);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(FAIL_MESSAGE);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.debug(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(EXCEPTION_MESSAGE);
+        }
     }
 
     @GetMapping("/sonar/{component}/bug")
     public ResponseEntity<String> getBug(@PathVariable("component") String component) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<BugDTO> bugList = sonarApiService.getSonarBug(component);
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<BugDTO> bugList = sonarApiService.getSonarBug(component);
+            if(!bugList.isEmpty()) {
+                String bugListString = objectMapper.writeValueAsString(bugList);
 
-        String bugListString = objectMapper.writeValueAsString(bugList);
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(bugListString);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(bugListString);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(FAIL_MESSAGE);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.debug(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(EXCEPTION_MESSAGE);
+        }
     }
 
     @GetMapping("/sonar/{component}/code_smell")
     public ResponseEntity<String> getCodeSmell(@PathVariable("component") String component) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<CodeSmellDTO> codeSmellList = sonarApiService.getSonarCodeSmell(component);
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<CodeSmellDTO> codeSmellList = sonarApiService.getSonarCodeSmell(component);
+            if(!codeSmellList.isEmpty()) {
+                String codeSmellListString = objectMapper.writeValueAsString(codeSmellList);
 
-        String codeSmellListString = objectMapper.writeValueAsString(codeSmellList);
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(codeSmellListString);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(codeSmellListString);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(FAIL_MESSAGE);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.debug(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(EXCEPTION_MESSAGE);
+        }
     }
 
     @GetMapping("/sonar/{component}/duplication")
     public ResponseEntity<String> getDuplication(@PathVariable("component") String component) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<DuplicationDTO> duplicationList = sonarApiService.getDuplication(component);
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<DuplicationDTO> duplicationList = sonarApiService.getDuplication(component);
+            if(!duplicationList.isEmpty()) {
+                String duplicationListString = objectMapper.writeValueAsString(duplicationList);
 
-        String duplicationListString = objectMapper.writeValueAsString(duplicationList);
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(duplicationListString);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(duplicationListString);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(FAIL_MESSAGE);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.debug(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(EXCEPTION_MESSAGE);
+        }
     }
 }

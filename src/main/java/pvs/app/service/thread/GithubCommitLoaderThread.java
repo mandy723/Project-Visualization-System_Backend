@@ -12,22 +12,21 @@ import pvs.app.service.GithubCommitService;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * //
  */
 public class GithubCommitLoaderThread extends Thread {
-
-    private static Object lock = new Object();
-
     static final Logger logger = LogManager.getLogger(GithubCommitLoaderThread.class.getName());
-    
-    private GithubCommitService githubCommitService;
-    private String repoOwner;
-    private String repoName;
-    private String cursor;
-    private WebClient webClient;
+
+    private static final Object lock = new Object();
+    private final GithubCommitService githubCommitService;
+    private final String repoOwner;
+    private final String repoName;
+    private final String cursor;
+    private final WebClient webClient;
 
     public GithubCommitLoaderThread(WebClient webClient, GithubCommitService githubCommitService, String repoOwner, String repoName, String cursor) {
         this.githubCommitService = githubCommitService;
@@ -46,13 +45,13 @@ public class GithubCommitLoaderThread extends Thread {
                         "... on Commit {" +
                             "history (last:100, before: \"" + this.cursor + "\") {" +
                                 "nodes {" +
-                                    "committedDate\n" +
-                                        "additions\n" +
-                                        "deletions\n" +
-                                        "changedFiles\n" +
+                                    "committedDate" +
+                                        "additions" +
+                                        "deletions" +
+                                        "changedFiles" +
                                         "author {" +
-                                            "email\n" +
-                                            "name\n" +
+                                            "email" +
+                                            "name" +
                                         "}" +
                                     "}" +
                                 "}" +
@@ -61,40 +60,39 @@ public class GithubCommitLoaderThread extends Thread {
                     "}" +
                 "}}");
 
-        String responseJson = this.webClient.post()
+        String responseJson = Objects.requireNonNull(this.webClient.post()
                 .body(BodyInserters.fromObject(graphQlQuery))
                 .exchange()
-                .block()
+                .block())
                 .bodyToMono(String.class)
                 .block();
 
         ObjectMapper mapper = new ObjectMapper();
 
-        Optional<JsonNode> commits = null;
         try {
-            commits = Optional.ofNullable(mapper.readTree(responseJson))
+            Optional<JsonNode> commits = Optional.ofNullable(mapper.readTree(responseJson))
                     .map(resp -> resp.get("data"))
                     .map(data -> data.get("repository"))
                     .map(repo -> repo.get("defaultBranchRef"))
                     .map(branch -> branch.get("target"))
                     .map(tag -> tag.get("history"))
                     .map(hist -> hist.get("nodes"));
+
+            commits.ifPresent(jsonNode -> jsonNode.forEach(entity -> {
+                GithubCommitDTO githubCommitDTO = new GithubCommitDTO();
+                githubCommitDTO.setRepoOwner(repoOwner);
+                githubCommitDTO.setRepoName(repoName);
+                githubCommitDTO.setAdditions(Integer.parseInt(entity.get("additions").toString()));
+                githubCommitDTO.setDeletions(Integer.parseInt(entity.get("deletions").toString()));
+                githubCommitDTO.setCommittedDate(entity.get("committedDate"));
+                githubCommitDTO.setAuthor(Optional.ofNullable(entity.get("author")));
+
+                synchronized (lock) {
+                    githubCommitService.save(githubCommitDTO);
+                }
+            }));
         } catch (IOException e) {
             Thread.currentThread().interrupt();
         }
-
-        commits.get().forEach(entity -> {
-            GithubCommitDTO githubCommitDTO = new GithubCommitDTO();
-            githubCommitDTO.setRepoOwner(repoOwner);
-            githubCommitDTO.setRepoName(repoName);
-            githubCommitDTO.setAdditions(Integer.parseInt(entity.get("additions").toString()));
-            githubCommitDTO.setDeletions(Integer.parseInt(entity.get("deletions").toString()));
-            githubCommitDTO.setCommittedDate(entity.get("committedDate"));
-            githubCommitDTO.setAuthor(Optional.ofNullable(entity.get("author")));
-
-            synchronized (lock) {
-                githubCommitService.save(githubCommitDTO);
-            }
-        });
     }
 }

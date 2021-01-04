@@ -2,6 +2,7 @@ package pvs.app.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,16 +14,28 @@ import pvs.app.dto.ResponseProjectDTO;
 import pvs.app.service.ProjectService;
 import pvs.app.service.RepositoryService;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class ProjectController {
-    private static final String URL_INVALID_MESSAGE = "你連URL都不會打嗎";
-
+    
     static final Logger logger = LogManager.getLogger(ProjectController.class.getName());
 
+    @Value("${message.exception}")
+    private String EXCEPTION_MESSAGE;
+
+    @Value("${message.invalid.url}")
+    private String URL_INVALID_MESSAGE;
+
+    @Value("${message.success}")
+    private String SUCCESS_MESSAGE;
+
+    @Value("${message.fail}")
+    private String FAIL_MESSAGE;
+    
     private final ProjectService projectService;
     private final RepositoryService repositoryService;
 
@@ -33,9 +46,8 @@ public class ProjectController {
 
     @GetMapping("/repository/github/check")
     public ResponseEntity<String> checkGithubURL(@RequestParam("url") String url) {
-        //我在檢查
         if(repositoryService.checkGithubURL(url)) {
-            return ResponseEntity.status(HttpStatus.OK).body("你成功了");
+            return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_MESSAGE);
         }
         else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(URL_INVALID_MESSAGE);
@@ -44,9 +56,8 @@ public class ProjectController {
 
     @GetMapping("/repository/sonar/check")
     public ResponseEntity<String> checkSonarURL(@RequestParam("url") String url) {
-        //我在檢查
         if(repositoryService.checkSonarURL(url)) {
-            return ResponseEntity.status(HttpStatus.OK).body("你成功了");
+            return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_MESSAGE);
         }
         else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(URL_INVALID_MESSAGE);
@@ -55,52 +66,51 @@ public class ProjectController {
 
     @PostMapping("/project")
     public ResponseEntity<String> createProject(@RequestBody CreateProjectDTO projectDTO) {
-        //我在檢查
         try{
             projectService.create(projectDTO);
-            return ResponseEntity.status(HttpStatus.OK).body("你成功了");
-        }catch(Exception e){
-            logger.debug(e.toString());
+            return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_MESSAGE);
+        } catch (IOException e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你去死吧");
+            logger.debug(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(EXCEPTION_MESSAGE);
         }
     }
 
     @PostMapping("/project/{projectId}/repository/sonar")
     public ResponseEntity<String> addSonarRepository(@RequestBody AddSonarRepositoryDTO addSonarRepositoryDTO) {
-        //我在檢查
         try{
             if(repositoryService.checkSonarURL(addSonarRepositoryDTO.getRepositoryURL())) {
-                projectService.addSonarRepo(addSonarRepositoryDTO);
-
-                return ResponseEntity.status(HttpStatus.OK).body("你成功了");
+                if(projectService.addSonarRepo(addSonarRepositoryDTO)) {
+                    return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_MESSAGE);
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(FAIL_MESSAGE);
+                }
             }
             else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(URL_INVALID_MESSAGE);
             }
         }catch(Exception e){
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你去死吧");
+            logger.debug(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(EXCEPTION_MESSAGE);
         }
     }
 
     @PostMapping("/project/{projectId}/repository/github")
     public ResponseEntity<String> addGithubRepository(@RequestBody AddGithubRepositoryDTO addGithubRepositoryDTO) {
-        //我在檢查
         try{
-            logger.debug(addGithubRepositoryDTO.getProjectId());
-            logger.debug(addGithubRepositoryDTO.getRepositoryURL());
-
             if(repositoryService.checkGithubURL(addGithubRepositoryDTO.getRepositoryURL())) {
-                projectService.addGithubRepo(addGithubRepositoryDTO);
-
-                return ResponseEntity.status(HttpStatus.OK).body("你成功了");
+                if(projectService.addGithubRepo(addGithubRepositoryDTO)) {
+                    return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_MESSAGE);
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(FAIL_MESSAGE);
+                }
             }
             else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(URL_INVALID_MESSAGE);
             }
         }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("你去死吧");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(EXCEPTION_MESSAGE);
         }
     }
 
@@ -124,10 +134,8 @@ public class ProjectController {
                            .filter(project -> project.getProjectId().equals(projectId))
                            .findFirst();
 
-        if(selectedProject.isPresent()) {
-            return ResponseEntity.status(HttpStatus.OK).body(selectedProject.get());
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        return selectedProject.map(responseProjectDTO -> ResponseEntity.status(HttpStatus.OK).body(responseProjectDTO))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null));
 
         //-/-/-/-/-/-/-/-/-/-/
         //    0        0    //

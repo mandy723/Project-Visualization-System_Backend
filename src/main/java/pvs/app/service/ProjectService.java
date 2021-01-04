@@ -12,6 +12,7 @@ import pvs.app.entity.Repository;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProjectService {
@@ -68,31 +69,40 @@ public class ProjectService {
         return projectDTOList;
     }
 
-    public void addSonarRepo(AddSonarRepositoryDTO addSonarRepositoryDTO) {
-        Project project = projectDAO.findById(addSonarRepositoryDTO.getProjectId()).get();
-
-        Repository repository = new Repository();
-        repository.setUrl(addSonarRepositoryDTO.getRepositoryURL());
-        repository.setType("sonar");
-        project.getRepositorySet().add(repository);
-        projectDAO.save(project);
+    public boolean addSonarRepo(AddSonarRepositoryDTO addSonarRepositoryDTO) {
+        Optional<Project> projectOptional = projectDAO.findById(addSonarRepositoryDTO.getProjectId());
+        if(projectOptional.isPresent()) {
+            Project project = projectOptional.get();
+            Repository repository = new Repository();
+            repository.setUrl(addSonarRepositoryDTO.getRepositoryURL());
+            repository.setType("sonar");
+            project.getRepositorySet().add(repository);
+            projectDAO.save(project);
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public void addGithubRepo(AddGithubRepositoryDTO addGithubRepositoryDTO) throws IOException {
-        Project project = projectDAO.findById(addGithubRepositoryDTO.getProjectId()).get();
-        String url = addGithubRepositoryDTO.getRepositoryURL();
-        Repository repository = new Repository();
-        repository.setUrl(url);
-        repository.setType("github");
-        project.getRepositorySet().add(repository);
-        String owner = url.split("/")[3];
-        JsonNode responseJson = githubApiService.getAvatarURL(owner);
-
-        if(responseJson != null) {
-            String json = responseJson.textValue();
-            project.setAvatarURL(json);
+    public boolean addGithubRepo(AddGithubRepositoryDTO addGithubRepositoryDTO) throws IOException {
+        Optional<Project> projectOptional = projectDAO.findById(addGithubRepositoryDTO.getProjectId());
+        if(projectOptional.isPresent()) {
+            Project project = projectOptional.get();
+            String url = addGithubRepositoryDTO.getRepositoryURL();
+            Repository repository = new Repository();
+            repository.setUrl(url);
+            repository.setType("github");
+            project.getRepositorySet().add(repository);
+            String owner = url.split("/")[3];
+            JsonNode responseJson = githubApiService.getAvatarURL(owner);
+            if(null != responseJson) {
+                String json = responseJson.textValue();
+                project.setAvatarURL(json);
+            }
+            projectDAO.save(project);
+            return true;
+        } else {
+            return false;
         }
-
-        projectDAO.save(project);
     }
 }

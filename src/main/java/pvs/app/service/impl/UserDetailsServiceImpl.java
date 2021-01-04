@@ -22,12 +22,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String userName) {
         try {
-            //查数据库
-            return memberDAO.findByUsername( userName );
+            return memberDAO.findByUsername(userName);
         } catch (UsernameNotFoundException e) {
-            logger.debug(e);
+            logger.debug(e.getMessage());
+            e.printStackTrace();
             return null;
         }
-
     }
 }
