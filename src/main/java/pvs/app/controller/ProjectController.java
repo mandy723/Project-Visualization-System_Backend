@@ -25,16 +25,16 @@ public class ProjectController {
     static final Logger logger = LogManager.getLogger(ProjectController.class.getName());
 
     @Value("${message.exception}")
-    private String EXCEPTION_MESSAGE;
+    private String exceptionMessage;
 
     @Value("${message.invalid.url}")
-    private String URL_INVALID_MESSAGE;
+    private String urlInvalidMessage;
 
     @Value("${message.success}")
-    private String SUCCESS_MESSAGE;
+    private String successMessage;
 
     @Value("${message.fail}")
-    private String FAIL_MESSAGE;
+    private String failMessage;
     
     private final ProjectService projectService;
     private final RepositoryService repositoryService;
@@ -47,20 +47,20 @@ public class ProjectController {
     @GetMapping("/repository/github/check")
     public ResponseEntity<String> checkGithubURL(@RequestParam("url") String url) {
         if(repositoryService.checkGithubURL(url)) {
-            return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_MESSAGE);
+            return ResponseEntity.status(HttpStatus.OK).body(successMessage);
         }
         else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(URL_INVALID_MESSAGE);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(urlInvalidMessage);
         }
     }
 
     @GetMapping("/repository/sonar/check")
     public ResponseEntity<String> checkSonarURL(@RequestParam("url") String url) {
         if(repositoryService.checkSonarURL(url)) {
-            return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_MESSAGE);
+            return ResponseEntity.status(HttpStatus.OK).body(successMessage);
         }
         else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(URL_INVALID_MESSAGE);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(urlInvalidMessage);
         }
     }
 
@@ -68,11 +68,11 @@ public class ProjectController {
     public ResponseEntity<String> createProject(@RequestBody CreateProjectDTO projectDTO) {
         try{
             projectService.create(projectDTO);
-            return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_MESSAGE);
+            return ResponseEntity.status(HttpStatus.OK).body(successMessage);
         } catch (IOException e) {
             e.printStackTrace();
             logger.debug(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(EXCEPTION_MESSAGE);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionMessage);
         }
     }
 
@@ -81,18 +81,18 @@ public class ProjectController {
         try{
             if(repositoryService.checkSonarURL(addSonarRepositoryDTO.getRepositoryURL())) {
                 if(projectService.addSonarRepo(addSonarRepositoryDTO)) {
-                    return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_MESSAGE);
+                    return ResponseEntity.status(HttpStatus.OK).body(successMessage);
                 } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(FAIL_MESSAGE);
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(failMessage);
                 }
             }
             else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(URL_INVALID_MESSAGE);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(urlInvalidMessage);
             }
         }catch(Exception e){
             e.printStackTrace();
             logger.debug(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(EXCEPTION_MESSAGE);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionMessage);
         }
     }
 
@@ -101,16 +101,16 @@ public class ProjectController {
         try{
             if(repositoryService.checkGithubURL(addGithubRepositoryDTO.getRepositoryURL())) {
                 if(projectService.addGithubRepo(addGithubRepositoryDTO)) {
-                    return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_MESSAGE);
+                    return ResponseEntity.status(HttpStatus.OK).body(successMessage);
                 } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(FAIL_MESSAGE);
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(failMessage);
                 }
             }
             else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(URL_INVALID_MESSAGE);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(urlInvalidMessage);
             }
         }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(EXCEPTION_MESSAGE);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionMessage);
         }
     }
 

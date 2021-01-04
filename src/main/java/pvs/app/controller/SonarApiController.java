@@ -1,6 +1,5 @@
 package pvs.app.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,16 +26,10 @@ import java.util.List;
 public class SonarApiController {
 
     @Value("${message.exception}")
-    private String EXCEPTION_MESSAGE;
-
-    @Value("${message.invalid.url}")
-    private String URL_INVALID_MESSAGE;
-
-    @Value("${message.success}")
-    private String SUCCESS_MESSAGE;
+    private String exceptionMessage;
 
     @Value("${message.fail}")
-    private String FAIL_MESSAGE;
+    private String failMessage;
 
     static final Logger logger = LogManager.getLogger(SonarApiController.class.getName());
     private final SonarApiService sonarApiService;
@@ -57,13 +50,13 @@ public class SonarApiController {
                         .body(coverageString);
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(FAIL_MESSAGE);
+                        .body(failMessage);
             }
         } catch (IOException e) {
             e.printStackTrace();
             logger.debug(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(EXCEPTION_MESSAGE);
+                    .body(exceptionMessage);
         }
     }
 
@@ -79,13 +72,13 @@ public class SonarApiController {
                         .body(bugListString);
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(FAIL_MESSAGE);
+                        .body(failMessage);
             }
         } catch (IOException e) {
             e.printStackTrace();
             logger.debug(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(EXCEPTION_MESSAGE);
+                    .body(exceptionMessage);
         }
     }
 
@@ -101,13 +94,13 @@ public class SonarApiController {
                         .body(codeSmellListString);
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(FAIL_MESSAGE);
+                        .body(failMessage);
             }
         } catch (IOException e) {
             e.printStackTrace();
             logger.debug(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(EXCEPTION_MESSAGE);
+                    .body(exceptionMessage);
         }
     }
 
@@ -123,13 +116,13 @@ public class SonarApiController {
                         .body(duplicationListString);
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(FAIL_MESSAGE);
+                        .body(failMessage);
             }
         } catch (IOException e) {
             e.printStackTrace();
             logger.debug(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(EXCEPTION_MESSAGE);
+                    .body(exceptionMessage);
         }
     }
 }

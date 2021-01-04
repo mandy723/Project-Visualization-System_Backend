@@ -25,7 +25,7 @@ import java.util.List;
 public class GithubApiController {
 
     @Value("${message.exception}")
-    private String EXCEPTION_MESSAGE;
+    private String exceptionMessage;
     
     static final Logger logger = LogManager.getLogger(GithubApiController.class.getName());
 
@@ -58,7 +58,7 @@ public class GithubApiController {
             e.printStackTrace();
             logger.debug(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(EXCEPTION_MESSAGE);
+                    .body(exceptionMessage);
         }
 
         if(callAPISuccess) {
@@ -86,7 +86,7 @@ public class GithubApiController {
             logger.debug(e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(EXCEPTION_MESSAGE);
+                    .body(exceptionMessage);
         }
     }
 
@@ -107,7 +107,7 @@ public class GithubApiController {
             e.printStackTrace();
             Thread.currentThread().interrupt();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(EXCEPTION_MESSAGE);
+                    .body(exceptionMessage);
         }
 
         try {
@@ -118,7 +118,7 @@ public class GithubApiController {
             logger.debug(e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(EXCEPTION_MESSAGE);
+                    .body(exceptionMessage);
         }
     }
 }
