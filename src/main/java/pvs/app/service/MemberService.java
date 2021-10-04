@@ -2,6 +2,7 @@ package pvs.app.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import pvs.app.dto.RoleDTO;
 import pvs.app.entity.Member;
 import pvs.app.dto.MemberDTO;
 import pvs.app.dao.MemberDAO;
@@ -30,6 +31,14 @@ public class MemberService {
         member.setPassword(encodePassword);
 
         Role userRole = roleService.getByName("USER");
+
+        if (userRole == null) {
+            RoleDTO roleDTO = new RoleDTO();
+            roleDTO.setName("USER");
+            roleService.save(roleDTO);
+            userRole = roleService.getByName("USER");
+        }
+
         if(userRole != null) {
             roleSet.add(userRole);
             member.setAuthorities(roleSet);

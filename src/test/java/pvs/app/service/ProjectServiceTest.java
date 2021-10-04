@@ -50,7 +50,7 @@ public class ProjectServiceTest {
         projectDTO = new CreateProjectDTO();
         projectDTO.setProjectName("react");
         projectDTO.setGithubRepositoryURL("https://github.com/facebook/react");
-        projectDTO.setSonarRepositoryURL("http://140.124.181.143:9000/dashboard?id=pvs-springboot");
+        projectDTO.setSonarRepositoryURL("http://localhost:9000/dashboard?id=pvs-springboot");
 
         project = new Project();
         project.setProjectId(1L);

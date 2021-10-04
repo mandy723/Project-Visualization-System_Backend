@@ -46,7 +46,7 @@ public class RepositoryServiceTest {
 
     @Test
     public void checkSonarURL_thenReturnTrue() throws InterruptedException {
-        boolean exist = repositoryService.checkSonarURL("http://140.124.181.143:9002/dashboard");
+        boolean exist = repositoryService.checkSonarURL("http://localhost:9000/dashboard");
         Assert.assertTrue(true);
     }
 

@@ -43,7 +43,7 @@ public class RepositoryService {
     }
 
     public boolean checkSonarURL(String url) {
-        if(!url.contains("140.124.181.143")){
+        if(!url.contains("localhost")){
             return false;
         }
 

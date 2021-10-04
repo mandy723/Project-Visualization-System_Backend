@@ -14,6 +14,6 @@ message:
 
 webClient:
   baseUrl:
-    sonar: "http://140.124.181.143:9002/api"
+    sonar: "http://localhost:9000/api"
     github: "https://api.github.com/graphql"
     test: ""
