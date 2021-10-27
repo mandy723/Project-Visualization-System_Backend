@@ -57,4 +57,11 @@ public class MemberService {
         memberDTO.setPassword(member.getPassword());
         return memberDTO;
     }
+    public static void main(String[] args){
+        Set<Role> roleSet = new HashSet<>();
+        Member member = new Member();
+        String password = "test";
+        String encodePassword = DigestUtils.md5DigestAsHex(password.getBytes());
+        System.out.printf(encodePassword);
+    }
 }
