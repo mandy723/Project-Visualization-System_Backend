@@ -121,4 +121,35 @@ public class GithubApiController {
                     .body(exceptionMessage);
         }
     }
+
+//    @PostMapping("/github/pull-requests/{repoId}")
+//    public ResponseEntity<String> postCommits(@PathVariable("repoId") String repoId) {
+//        boolean callAPISuccess;
+//        Date lastUpdate;
+//        GithubCommitDTO githubCommitDTO = githubCommitService.getLastCommit(repoOwner, repoName);
+//        if (null == githubCommitDTO) {
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.set(1970, Calendar.JANUARY, 1);
+//            lastUpdate = calendar.getTime();
+//        } else {
+//            lastUpdate = githubCommitDTO.getCommittedDate();
+//        }
+//
+//        try{
+//            callAPISuccess = githubApiService.getCommitsFromGithub(repoOwner, repoName, lastUpdate);
+//        } catch (InterruptedException | IOException e) {
+//            Thread.currentThread().interrupt();
+//            e.printStackTrace();
+//            logger.debug(e.getMessage());
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                    .body(exceptionMessage);
+//        }
+//
+//        if(callAPISuccess) {
+//            return ResponseEntity.status(HttpStatus.OK).body("success get commit data and save to database");
+//        } else {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                    .body("cannot get commit data");
+//        }
+//    }
 }

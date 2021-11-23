@@ -1,10 +1,9 @@
 package pvs.app.service;
 
 import org.modelmapper.ModelMapper;
-import pvs.app.dao.GithubCommitDAO;
-import pvs.app.dto.GithubCommitDTO;
-import pvs.app.entity.GithubCommit;
-
+import pvs.app.dao.GithubPullRequestDAO;
+import pvs.app.dto.GithubPullRequestDTO;
+import pvs.app.entity.GithubPullRequest;
 import java.util.LinkedList;
 import java.util.List;
 
