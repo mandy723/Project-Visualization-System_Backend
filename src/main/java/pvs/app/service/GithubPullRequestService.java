@@ -1,12 +1,14 @@
 package pvs.app.service;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
 import pvs.app.dao.GithubPullRequestDAO;
 import pvs.app.dto.GithubPullRequestDTO;
 import pvs.app.entity.GithubPullRequest;
 import java.util.LinkedList;
 import java.util.List;
 
+@Service
 public class GithubPullRequestService {
 
     private final GithubPullRequestDAO githubPullRequestDAO;
