@@ -66,7 +66,7 @@ public class GithubApiService {
     private void setGraphQlGetIssuesTotalCountQuery(String owner, String name) {
         Map<String, Object> graphQl = new HashMap<>();
         graphQl.put("query", "{repository(owner: \"" + owner + "\", name:\"" + name + "\") {" +
-                                "issues (first: 100) {" +
+                                "issues {" +
                                     "totalCount" +
                                 "}" +
                             "}}");
