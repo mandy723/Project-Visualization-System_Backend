@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import pvs.app.dto.GithubIssueDTO;
+import pvs.app.dto.GithubPullRequestDTO;
 import pvs.app.service.thread.GithubCommitLoaderThread;
 import pvs.app.service.thread.GithubIssueLoaderThread;
 
@@ -70,6 +71,21 @@ public class GithubApiService {
                                     "totalCount" +
                                 "}" +
                             "}}");
+        this.graphQlQuery = graphQl;
+    }
+
+    private void setGraphQlGetPullRequestTotalCountQuery(String owner, String name) {
+        Map<String, Object> graphQl = new HashMap<>();
+        graphQl.put("query", "{repository(owner: \"" + owner + "\", name:\"" + name + "\") {" +
+                "pullRequests {" +
+                    "pageInfo {" +
+                        "startCursor" +
+                        "hasNextPage" +
+                        "endCursor" +
+                    "}" +
+                    "totalCount" +
+                    "}" +
+                "}}");
         this.graphQlQuery = graphQl;
     }
 
@@ -154,7 +170,7 @@ public class GithubApiService {
         Optional<JsonNode> paginationInfo = Optional.ofNullable(mapper.readTree(responseJson))
                 .map(resp -> resp.get("data"))
                 .map(data -> data.get("repository"))
-                .map(repo -> repo.get("issues"));
+                .map(repo -> repo.get("issue"));
 
         if(paginationInfo.isPresent()) {
             double totalCount = paginationInfo.get().get("totalCount").asInt();
@@ -181,6 +197,56 @@ public class GithubApiService {
         }
         return githubIssueDTOList;
     }
+
+    public List<GithubPullRequestDTO> getPullRequestFromGithub(String owner, String name) throws IOException, InterruptedException  {
+        List<GithubPullRequestDTO> githubPullRequestDTOList = new ArrayList<>();
+        this.setGraphQlGetPullRequestTotalCountQuery(owner, name);
+
+        String responseJson = Objects.requireNonNull(this.webClient.post()
+                        .body(BodyInserters.fromObject(this.graphQlQuery))
+                        .exchange()
+                        .block())
+                .bodyToMono(String.class)
+                .block();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        Optional<JsonNode> paginationInfo = Optional.ofNullable(mapper.readTree(responseJson))
+                .map(resp -> resp.get("data"))
+                .map(data -> data.get("repository"))
+                .map(repo -> repo.get("pullRequests"));
+
+        if(paginationInfo.isPresent()) {
+            double totalCount = paginationInfo.get().get("totalCount").asInt();
+
+            List<String> githubPullRequestCursorList = new ArrayList<>();
+
+            List<GithubPullRequestLoaderThread> githubPullRequestLoaderThreadList = new ArrayList<>();
+
+            String afterCursor = null;
+
+            if (0 != totalCount) {
+                for (int i = 1; i <= Math.ceil(totalCount/100); i++) {
+                    GithubIssueLoaderThread githubIssueLoaderThread =
+                            new GithubIssueLoaderThread(
+                                    githubIssueDTOList,
+                                    owner,
+                                    name,
+                                    afterCursor);
+                    githubIssueLoaderThreadList.add(githubIssueLoaderThread);
+                    githubIssueLoaderThread.start();
+                }
+
+                for (GithubIssueLoaderThread thread: githubIssueLoaderThreadList) {
+                    thread.join();
+                }
+            }
+        } else {
+            return null;
+        }
+        return githubPullRequestDTOList;
+    }
+
 
     public JsonNode getAvatarURL(String owner) throws IOException {
         this.setGraphQlGetAvatarQuery(owner);
