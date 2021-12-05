@@ -12,7 +12,7 @@ import pvs.app.dto.GithubIssueDTO;
 import pvs.app.dto.GithubPullRequestDTO;
 import pvs.app.service.thread.GithubCommitLoaderThread;
 import pvs.app.service.thread.GithubIssueLoaderThread;
-
+import pvs.app.service.thread.GithubPullRequestLoaderThread;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -78,11 +78,6 @@ public class GithubApiService {
         Map<String, Object> graphQl = new HashMap<>();
         graphQl.put("query", "{repository(owner: \"" + owner + "\", name:\"" + name + "\") {" +
                 "pullRequests {" +
-                    "pageInfo {" +
-                        "startCursor" +
-                        "hasNextPage" +
-                        "endCursor" +
-                    "}" +
                     "totalCount" +
                     "}" +
                 "}}");
@@ -170,7 +165,7 @@ public class GithubApiService {
         Optional<JsonNode> paginationInfo = Optional.ofNullable(mapper.readTree(responseJson))
                 .map(resp -> resp.get("data"))
                 .map(data -> data.get("repository"))
-                .map(repo -> repo.get("issue"));
+                .map(repo -> repo.get("issues"));
 
         if(paginationInfo.isPresent()) {
             double totalCount = paginationInfo.get().get("totalCount").asInt();
@@ -219,25 +214,21 @@ public class GithubApiService {
         if(paginationInfo.isPresent()) {
             double totalCount = paginationInfo.get().get("totalCount").asInt();
 
-            List<String> githubPullRequestCursorList = new ArrayList<>();
-
             List<GithubPullRequestLoaderThread> githubPullRequestLoaderThreadList = new ArrayList<>();
 
-            String afterCursor = null;
-
-            if (0 != totalCount) {
+            if (totalCount != 0) {
                 for (int i = 1; i <= Math.ceil(totalCount/100); i++) {
-                    GithubIssueLoaderThread githubIssueLoaderThread =
-                            new GithubIssueLoaderThread(
-                                    githubIssueDTOList,
+                    GithubPullRequestLoaderThread githubPullRequestLoaderThread =
+                            new GithubPullRequestLoaderThread(
+                                    githubPullRequestDTOList,
                                     owner,
                                     name,
-                                    afterCursor);
-                    githubIssueLoaderThreadList.add(githubIssueLoaderThread);
-                    githubIssueLoaderThread.start();
+                                    i);
+                    githubPullRequestLoaderThreadList.add(githubPullRequestLoaderThread);
+                    githubPullRequestLoaderThread.start();
                 }
 
-                for (GithubIssueLoaderThread thread: githubIssueLoaderThreadList) {
+                for (GithubPullRequestLoaderThread thread: githubPullRequestLoaderThreadList) {
                     thread.join();
                 }
             }

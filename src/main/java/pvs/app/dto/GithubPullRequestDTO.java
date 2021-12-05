@@ -1,26 +1,43 @@
 package pvs.app.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import java.util.Date;
 
 public class GithubPullRequestDTO {
-    private Date pullRequestDate;
-    private String status;
+    private Date createdAt;
+    private Date mergedAt;
+    private String state;
     private String author;
 
-    public Date getPullRequestDate() {
-        return pullRequestDate;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setPullRequestDate(Date pullRequestDate) {
-        this.pullRequestDate = pullRequestDate;
+    public void setCreatedAt(JsonNode createdAt) {
+        DateTimeFormatter isoParser = ISODateTimeFormat.dateTimeNoMillis();
+        this.createdAt = isoParser.parseDateTime(createdAt.toString().replace("\"", "")).toDate();
     }
 
-    public String getStatus() {
-        return status;
+    public Date getMergedAt() {
+        return mergedAt;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setMergedAt(JsonNode mergedAt) {
+        DateTimeFormatter isoParser = ISODateTimeFormat.dateTimeNoMillis();
+        String result = mergedAt.toString();
+        if(result != "null"){
+            this.mergedAt = isoParser.parseDateTime(result.replace("\"", "")).toDate();
+        }
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     public String getAuthor() {
@@ -30,6 +47,4 @@ public class GithubPullRequestDTO {
     public void setAuthor(String author) {
         this.author = author;
     }
-
-
 }
