@@ -6,7 +6,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -27,7 +26,6 @@ public class GithubCommitDTO {
     private int changeFiles;
     private String authorName;
     private String authorEmail;
-
 
     public void setCommittedDate(Date committedDate) {
         this.committedDate = committedDate;

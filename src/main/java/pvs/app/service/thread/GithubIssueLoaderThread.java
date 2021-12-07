@@ -6,7 +6,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.web.reactive.function.client.WebClient;
 import pvs.app.dto.GithubIssueDTO;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -53,6 +52,7 @@ public class GithubIssueLoaderThread extends Thread {
                 githubIssueDTO.setRepoName(repoName);
                 githubIssueDTO.setCreatedAt(entity.get("created_at"));
                 githubIssueDTO.setClosedAt(entity.get("closed_at"));
+                githubIssueDTO.setAuthor(entity.get("user").get("login").textValue());
 
                 synchronized (lock) {
                     githubIssueDTOList.add(githubIssueDTO);

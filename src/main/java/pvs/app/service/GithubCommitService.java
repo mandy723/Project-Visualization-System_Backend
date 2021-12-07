@@ -1,21 +1,15 @@
 package pvs.app.service;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import pvs.app.entity.GithubCommit;
 import pvs.app.dto.GithubCommitDTO;
 import pvs.app.dao.GithubCommitDAO;
-
 import java.util.LinkedList;
 import java.util.List;
 
 @Service
 public class GithubCommitService {
-
-    static final Logger logger = LogManager.getLogger(GithubCommitService.class.getName());
-
 
     private final GithubCommitDAO githubCommitDAO;
     private final ModelMapper modelMapper;

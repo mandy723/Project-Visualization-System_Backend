@@ -32,9 +32,6 @@ public class GithubCommit {
     private int deletions;
 
     @NotNull
-    private int changeFiles;
-
-    @NotNull
     private String authorName;
 
     @NotNull
@@ -51,7 +48,6 @@ public class GithubCommit {
         GithubCommit that = (GithubCommit) o;
         return additions == that.additions &&
                 deletions == that.deletions &&
-                changeFiles == that.changeFiles &&
                 id.equals(that.id) &&
                 repoOwner.equals(that.repoOwner) &&
                 repoName.equals(that.repoName) &&
@@ -63,6 +59,6 @@ public class GithubCommit {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, repoOwner, repoName, committedDate, additions, deletions, changeFiles, authorName, authorEmail, repository);
+        return Objects.hash(id, repoOwner, repoName, committedDate, additions, deletions, authorName, authorEmail, repository);
     }
 }

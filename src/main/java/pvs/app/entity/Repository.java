@@ -25,4 +25,7 @@ public class Repository {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "repository")
     private Set<GithubPullRequest> githubPullRequestSet;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "repository")
+    private Set<GithubComment> githubCommentsSet;
 }

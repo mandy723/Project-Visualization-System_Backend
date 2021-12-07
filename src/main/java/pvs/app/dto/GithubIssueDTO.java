@@ -13,14 +13,10 @@ public class GithubIssueDTO {
     private String repoName;
     private Date createdAt;
     private Date closedAt;
-
+    private String author;
 
     public Date getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
     }
 
     public void setCreatedAt(JsonNode createdAt) {
@@ -32,14 +28,18 @@ public class GithubIssueDTO {
         return closedAt;
     }
 
-    public void setClosedAt(Date closedAt) {
-        this.closedAt = closedAt;
-    }
-
     public void setClosedAt(JsonNode closedAt) {
         if(closedAt != null && closedAt.textValue() != null) {
             DateTimeFormatter isoParser = ISODateTimeFormat.dateTimeNoMillis();
             this.closedAt = isoParser.parseDateTime(closedAt.toString().replace("\"", "")).toDate();
         }
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 }
