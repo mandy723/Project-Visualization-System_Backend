@@ -273,6 +273,8 @@ public class GithubApiService {
             Optional<JsonNode> commentList = Optional.ofNullable(mapper.readTree(responseJson));
             commentList.ifPresent(jsonNode -> jsonNode.forEach(entity -> {
                 GithubCommentDTO githubCommentDTO = new GithubCommentDTO();
+                githubCommentDTO.setRepoOwner(owner);
+                githubCommentDTO.setRepoName(name);
                 githubCommentDTO.setCreatedAt(entity.get("created_at"));
                 githubCommentDTO.setAuthor(entity.get("user").get("login").textValue());
 

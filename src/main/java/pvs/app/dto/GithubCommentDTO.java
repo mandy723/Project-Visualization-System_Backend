@@ -7,11 +7,30 @@ import java.util.Date;
 
 public class GithubCommentDTO {
 
+
+    private String repoOwner;
+    private String repoName;
     private String author;
     private Date createdAt;
 
     public String getAuthor() {
         return author;
+    }
+
+    public String getRepoOwner() {
+        return repoOwner;
+    }
+
+    public void setRepoOwner(String repoOwner) {
+        this.repoOwner = repoOwner;
+    }
+
+    public String getRepoName() {
+        return repoName;
+    }
+
+    public void setRepoName(String repoName) {
+        this.repoName = repoName;
     }
 
     public void setCreatedAt(Date createdAt) {

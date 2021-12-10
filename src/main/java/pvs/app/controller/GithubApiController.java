@@ -183,10 +183,32 @@ public class GithubApiController {
         }
 
         if(callAPISuccess) {
-            return ResponseEntity.status(HttpStatus.OK).body("success get commit data and save to database");
+            return ResponseEntity.status(HttpStatus.OK).body("success get comment data and save to database");
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("cannot get comment data");
         }
     }
+
+    @GetMapping("/github/comments/{repoOwner}/{repoName}")
+    public ResponseEntity<String> getComments(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        List<GithubCommentDTO> githubCommentDTOs = githubCommentService.getAllComments(repoOwner, repoName);
+
+        String githubCommentDTOsJson;
+
+        try {
+            githubCommentDTOsJson = objectMapper.writeValueAsString(githubCommentDTOs);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(githubCommentDTOsJson);
+        } catch (JsonProcessingException e) {
+            logger.debug(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(exceptionMessage);
+        }
+    }
+
 }

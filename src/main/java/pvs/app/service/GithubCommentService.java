@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import pvs.app.dao.GithubCommentDAO;
 import pvs.app.dto.GithubCommentDTO;
 import pvs.app.entity.GithubComment;
+import java.util.LinkedList;
+import java.util.List;
 
 @Service
 public class GithubCommentService {
@@ -19,6 +21,18 @@ public class GithubCommentService {
     public void save(GithubCommentDTO githubCommentDTO) {
         GithubComment githubComment = modelMapper.map(githubCommentDTO, GithubComment.class);
         githubCommentDAO.save(githubComment);
+    }
+
+    public List<GithubCommentDTO> getAllComments(String repoOwner, String repoName) {
+        List<GithubComment> entities = githubCommentDAO.findByRepoOwnerAndRepoName(repoOwner, repoName);
+        List<GithubCommentDTO> githubCommentDTOs = new LinkedList<>();
+
+        for (GithubComment githubComment : entities) {
+            GithubCommentDTO dto = modelMapper.map(githubComment, GithubCommentDTO.class);
+            dto.setCreatedAt(githubComment.getCreatedAt());
+            githubCommentDTOs.add(dto);
+        }
+        return githubCommentDTOs;
     }
 
     public GithubCommentDTO getLastComment(String repoOwner, String repoName) {
