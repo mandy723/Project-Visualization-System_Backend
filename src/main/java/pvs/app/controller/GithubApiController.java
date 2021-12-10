@@ -10,9 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pvs.app.dto.GithubCommentDTO;
 import pvs.app.dto.GithubCommitDTO;
 import pvs.app.dto.GithubIssueDTO;
 import pvs.app.dto.GithubPullRequestDTO;
+import pvs.app.service.GithubCommentService;
 import pvs.app.service.GithubCommitService;
 import pvs.app.service.GithubApiService;
 import java.io.IOException;
@@ -31,10 +33,12 @@ public class GithubApiController {
 
     private final GithubApiService githubApiService;
     private final GithubCommitService githubCommitService;
+    private final GithubCommentService githubCommentService;
 
-    public GithubApiController(GithubApiService githubApiService, GithubCommitService githubCommitService) {
+    public GithubApiController(GithubApiService githubApiService, GithubCommitService githubCommitService, GithubCommentService githubCommentService) {
         this.githubApiService = githubApiService;
         this.githubCommitService = githubCommitService;
+        this.githubCommentService = githubCommentService;
     }
 
     @SneakyThrows
@@ -151,6 +155,38 @@ public class GithubApiController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(exceptionMessage);
+        }
+    }
+
+    @SneakyThrows
+    @PostMapping("/github/comments/{repoOwner}/{repoName}")
+    public ResponseEntity<String> postComments(@PathVariable("repoOwner") String repoOwner, @PathVariable("repoName") String repoName) {
+        boolean callAPISuccess;
+        Date lastUpdate;
+        GithubCommentDTO githubCommentDTO = githubCommentService.getLastComment(repoOwner, repoName);
+        if (null == githubCommentDTO) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(1970, Calendar.JANUARY, 1);
+            lastUpdate = calendar.getTime();
+        } else {
+            lastUpdate = githubCommentDTO.getCreatedAt();
+        }
+
+        try{
+            callAPISuccess = githubApiService.getCommentFromGithub(repoOwner, repoName, lastUpdate);
+        } catch (InterruptedException | IOException e) {
+            Thread.currentThread().interrupt();
+            e.printStackTrace();
+            logger.debug(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(exceptionMessage);
+        }
+
+        if(callAPISuccess) {
+            return ResponseEntity.status(HttpStatus.OK).body("success get commit data and save to database");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("cannot get comment data");
         }
     }
 }

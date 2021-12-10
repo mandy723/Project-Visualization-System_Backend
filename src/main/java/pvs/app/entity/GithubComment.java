@@ -4,6 +4,7 @@ import lombok.Data;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Data
@@ -28,4 +29,22 @@ public class GithubComment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="repository_id")
     private Repository repository;
+
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        GithubComment that = (GithubComment) o;
+//        return id.equals(that.id) &&
+//                repoOwner.equals(that.repoOwner) &&
+//                repoName.equals(that.repoName) &&
+//                createdAt.equals(that.createdAt) &&
+//                author.equals(that.author) &&
+//                repository.equals(that.repository);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(id, repoOwner, repoName, createdAt, repository);
+//    }
 }

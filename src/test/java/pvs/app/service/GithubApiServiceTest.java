@@ -28,6 +28,9 @@ public class GithubApiServiceTest {
     @MockBean
     private GithubCommitService githubCommitService;
 
+    @MockBean
+    private GithubCommentService githubCommentService;
+
     private MockWebServer mockWebServer;
 
     private GithubApiService githubApiService;
@@ -35,7 +38,7 @@ public class GithubApiServiceTest {
     @Before
     public void setup() {
         this.mockWebServer = new MockWebServer();
-        this.githubApiService = new GithubApiService(WebClient.builder(), mockWebServer.url("/").toString(), githubCommitService);
+        this.githubApiService = new GithubApiService(WebClient.builder(), mockWebServer.url("/").toString(), githubCommitService, githubCommentService);
     }
 
     @Test

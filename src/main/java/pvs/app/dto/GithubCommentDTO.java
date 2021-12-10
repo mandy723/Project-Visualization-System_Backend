@@ -1,5 +1,8 @@
 package pvs.app.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import java.util.Date;
 
 public class GithubCommentDTO {
@@ -7,13 +10,25 @@ public class GithubCommentDTO {
     private String author;
     private Date createdAt;
 
-//    private Map<String, Integer> authorToNumberOfComments;
-//
-//    public Map<String, Integer> getAuthorToNumberOfComments() {
-//        return authorToNumberOfComments;
-//    }
-//
-//    public void setAuthorToNumberOfComments(Map<String, Integer> authorToNumberOfComments) {
-//        this.authorToNumberOfComments = authorToNumberOfComments;
-//    }
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(JsonNode createdAt) {
+        DateTimeFormatter isoParser = ISODateTimeFormat.dateTimeNoMillis();
+        this.createdAt =
+                isoParser.parseDateTime(createdAt.toString().replace("\"", "")).toDate();
+    }
 }

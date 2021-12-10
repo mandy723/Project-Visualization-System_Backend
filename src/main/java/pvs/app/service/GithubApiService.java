@@ -2,12 +2,11 @@ package pvs.app.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import pvs.app.dto.GithubCommentDTO;
 import pvs.app.dto.GithubIssueDTO;
 import pvs.app.dto.GithubPullRequestDTO;
 import pvs.app.service.thread.GithubCommitLoaderThread;
@@ -21,18 +20,20 @@ import java.util.*;
 @SuppressWarnings("squid:S1192")
 public class GithubApiService {
 
-    static final Logger logger = LogManager.getLogger(GithubApiService.class.getName());
-
-    private final WebClient webClient;
-
+    private final WebClient webClientGraphQl;
+    private final WebClient webClientRestAPI;
     private Map<String, Object> graphQlQuery;
-
     private final GithubCommitService githubCommitService;
+    private final  GithubCommentService githubCommentService;
 
-    public GithubApiService(WebClient.Builder webClientBuilder, @Value("${webClient.baseUrl.github}") String baseUrl, GithubCommitService githubCommitService) {
+    public GithubApiService(WebClient.Builder webClientBuilder, @Value("${webClient.baseUrl.github}") String baseUrl, GithubCommitService githubCommitService, GithubCommentService githubCommentService) {
         String token = System.getenv("PVS_GITHUB_TOKEN");
         this.githubCommitService = githubCommitService;
-        this.webClient = webClientBuilder.baseUrl(baseUrl)
+        this.githubCommentService = githubCommentService;
+        this.webClientGraphQl = webClientBuilder.baseUrl(baseUrl)
+                .defaultHeader("Authorization", "Bearer " + token)
+                .build();
+        this.webClientRestAPI = WebClient.builder().baseUrl("https://api.github.com/repos")
                 .defaultHeader("Authorization", "Bearer " + token)
                 .build();
     }
@@ -104,7 +105,7 @@ public class GithubApiService {
     public boolean getCommitsFromGithub(String owner, String name, Date lastUpdate) throws InterruptedException, IOException {
         this.setGraphQlGetCommitsTotalCountAndCursorQuery(owner, name, lastUpdate);
 
-        String responseJson = Objects.requireNonNull(this.webClient.post()
+        String responseJson = Objects.requireNonNull(this.webClientGraphQl.post()
                 .body(BodyInserters.fromObject(this.graphQlQuery))
                 .exchange()
                 .block())
@@ -130,7 +131,7 @@ public class GithubApiService {
                 for (int i = 1; i <= Math.ceil(totalCount/100); i++) {
                     GithubCommitLoaderThread githubCommitLoaderThread =
                             new GithubCommitLoaderThread(
-                                    this.webClient,
+                                    this.webClientGraphQl,
                                     this.githubCommitService,
                                     owner,
                                     name,
@@ -153,7 +154,7 @@ public class GithubApiService {
         List<GithubIssueDTO> githubIssueDTOList = new ArrayList<>();
         this.setGraphQlGetIssuesTotalCountQuery(owner, name);
 
-        String responseJson = Objects.requireNonNull(this.webClient.post()
+        String responseJson = Objects.requireNonNull(this.webClientGraphQl.post()
                 .body(BodyInserters.fromObject(this.graphQlQuery))
                 .exchange()
                 .block())
@@ -197,7 +198,7 @@ public class GithubApiService {
         List<GithubPullRequestDTO> githubPullRequestDTOList = new ArrayList<>();
         this.setGraphQlGetPullRequestTotalCountQuery(owner, name);
 
-        String responseJson = Objects.requireNonNull(this.webClient.post()
+        String responseJson = Objects.requireNonNull(this.webClientGraphQl.post()
                         .body(BodyInserters.fromObject(this.graphQlQuery))
                         .exchange()
                         .block())
@@ -241,7 +242,7 @@ public class GithubApiService {
 
     public JsonNode getAvatarURL(String owner) throws IOException {
         this.setGraphQlGetAvatarQuery(owner);
-        String responseJson = Objects.requireNonNull(this.webClient.post()
+        String responseJson = Objects.requireNonNull(this.webClientGraphQl.post()
                 .body(BodyInserters.fromObject(this.graphQlQuery))
                 .exchange()
                 .block())
@@ -257,6 +258,30 @@ public class GithubApiService {
                 .map(node -> node.get("avatarUrl"));
 
         return avatar.orElse( null);
+    }
+
+    public boolean getCommentFromGithub(String owner, String name, Date lastUpdate) throws InterruptedException, IOException {
+        try {
+            String responseJson = Objects.requireNonNull(this.webClientRestAPI.get()
+                            .uri("/" + owner + "/" + name + "/issues/comments?since:" + lastUpdate)
+                            .exchange()
+                            .block())
+                    .bodyToMono(String.class)
+                    .block();
+            ObjectMapper mapper = new ObjectMapper();
+
+            Optional<JsonNode> commentList = Optional.ofNullable(mapper.readTree(responseJson));
+            commentList.ifPresent(jsonNode -> jsonNode.forEach(entity -> {
+                GithubCommentDTO githubCommentDTO = new GithubCommentDTO();
+                githubCommentDTO.setCreatedAt(entity.get("created_at"));
+                githubCommentDTO.setAuthor(entity.get("user").get("login").textValue());
+
+                githubCommentService.save(githubCommentDTO);
+            }));
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 }
 
