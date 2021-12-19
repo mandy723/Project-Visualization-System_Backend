@@ -1,14 +1,12 @@
 package pvs.app.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import pvs.app.dao.ProjectDAO;
+import pvs.app.dao.RepositoryDAO;
 import pvs.app.dto.*;
 import pvs.app.entity.Project;
 import pvs.app.entity.Repository;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,13 +15,12 @@ import java.util.Optional;
 @Service
 public class ProjectService {
     private final ProjectDAO projectDAO;
-
+    private final RepositoryDAO repositoryDAO;
     private final GithubApiService githubApiService;
 
-    static final Logger logger = LogManager.getLogger(ProjectService.class.getName());
-
-    public ProjectService(ProjectDAO projectDAO, GithubApiService githubApiService) {
+    public ProjectService(ProjectDAO projectDAO, RepositoryDAO repositoryDAO, GithubApiService githubApiService) {
         this.projectDAO = projectDAO;
+        this.repositoryDAO = repositoryDAO;
         this.githubApiService = githubApiService;
     }
 
@@ -89,10 +86,15 @@ public class ProjectService {
         if(projectOptional.isPresent()) {
             Project project = projectOptional.get();
             String url = addGithubRepositoryDTO.getRepositoryURL();
-            Repository repository = new Repository();
-            repository.setUrl(url);
-            repository.setType("github");
+
+            Repository repository = repositoryDAO.findByUrl(url);
+            if(repository == null){
+                repository = new Repository();
+                repository.setUrl(url);
+                repository.setType("github");
+            }
             project.getRepositorySet().add(repository);
+
             String owner = url.split("/")[3];
             JsonNode responseJson = githubApiService.getAvatarURL(owner);
             if(null != responseJson) {

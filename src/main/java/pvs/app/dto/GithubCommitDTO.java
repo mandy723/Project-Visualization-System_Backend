@@ -23,7 +23,6 @@ public class GithubCommitDTO {
     private Date committedDate;
     private int additions;
     private int deletions;
-    private int changeFiles;
     private String authorName;
     private String authorEmail;
 
