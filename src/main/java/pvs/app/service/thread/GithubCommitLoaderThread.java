@@ -25,13 +25,15 @@ public class GithubCommitLoaderThread extends Thread {
     private final GithubCommitService githubCommitService;
     private final String repoOwner;
     private final String repoName;
+    private final int last;
     private final String cursor;
     private final WebClient webClient;
 
-    public GithubCommitLoaderThread(WebClient webClient, GithubCommitService githubCommitService, String repoOwner, String repoName, String cursor) {
+    public GithubCommitLoaderThread(WebClient webClient, GithubCommitService githubCommitService, String repoOwner, String repoName, int last, String cursor) {
         this.githubCommitService = githubCommitService;
         this.repoOwner = repoOwner;
         this.repoName = repoName;
+        this.last = last;
         this.cursor = cursor;
         this.webClient = webClient;
     }
@@ -43,7 +45,7 @@ public class GithubCommitLoaderThread extends Thread {
                 "defaultBranchRef {" +
                     "target {" +
                         "... on Commit {" +
-                            "history (last:100, before: \"" + this.cursor + "\") {" +
+                            "history (last:" + this.last + ", before: \"" + this.cursor + "\") {" +
                                 "nodes {" +
                                         "committedDate\n" +
                                         "additions\n" +

@@ -41,7 +41,7 @@ public class GithubApiService {
     private String dateToISO8601(Date date) {
         SimpleDateFormat sdf;
         sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         return sdf.format(date);
     }
 
@@ -122,20 +122,37 @@ public class GithubApiService {
                 .map(tag -> tag.get("history"));
 
         if(paginationInfo.isPresent()) {
-            double totalCount = paginationInfo.get().get("totalCount").asInt();
+            int totalCount = paginationInfo.get().get("totalCount").asInt();
+
             List<GithubCommitLoaderThread> githubCommitLoaderThreadList = new ArrayList<>();
 
             if (totalCount != 0) {
                 String cursor = paginationInfo.get().get("pageInfo").get("startCursor").textValue()
                         .split(" ")[0];
-                for (int i = 1; i <= Math.ceil(totalCount/100); i++) {
+                int last = 100;
+                for (int i = 1; i <= totalCount/100; i++) {
                     GithubCommitLoaderThread githubCommitLoaderThread =
                             new GithubCommitLoaderThread(
                                     this.webClientGraphQl,
                                     this.githubCommitService,
                                     owner,
                                     name,
+                                    last,
                                     cursor + " " + (i*100));
+                    githubCommitLoaderThreadList.add(githubCommitLoaderThread);
+                    githubCommitLoaderThread.start();
+                }
+                if(totalCount % 100 != 0) {
+                    last = totalCount % 100 - 1;
+
+                    GithubCommitLoaderThread githubCommitLoaderThread =
+                            new GithubCommitLoaderThread(
+                                    this.webClientGraphQl,
+                                    this.githubCommitService,
+                                    owner,
+                                    name,
+                                    last,
+                                    cursor + " " + (totalCount - 1));
                     githubCommitLoaderThreadList.add(githubCommitLoaderThread);
                     githubCommitLoaderThread.start();
                 }
