@@ -25,7 +25,7 @@ public class GithubIssueLoaderThread extends Thread {
 
     public GithubIssueLoaderThread(List<GithubIssueDTO> githubIssueDTOList, String repoOwner, String repoName, int page) {
         String token = System.getenv("PVS_GITHUB_TOKEN");
-        this.webClient = WebClient.builder().baseUrl("https://api.github.com/repos")
+        this.webClient = WebClient.builder().baseUrl("https://api.github.com/search")
                 .defaultHeader("Authorization", "Bearer " + token)
                 .build();
         this.githubIssueDTOList = githubIssueDTOList;
@@ -37,19 +37,20 @@ public class GithubIssueLoaderThread extends Thread {
     @Override
     public void run() {
         String responseJson = Objects.requireNonNull(this.webClient.get()
-                .uri("/" + this.repoOwner + "/" + this.repoName + "/issues?page=" + this.page + "&per_page=100&state=all")
-                .exchange()
-                .block())
+                        .uri( "/issues?q=is:issue repo:" + this.repoOwner + "/" + this.repoName)
+                        .exchange()
+                        .block())
                 .bodyToMono(String.class)
                 .block();
         ObjectMapper mapper = new ObjectMapper();
 
         try {
-            Optional<JsonNode> issueList = Optional.ofNullable(mapper.readTree(responseJson));
-            issueList.ifPresent(jsonNode -> jsonNode.forEach(entity -> {
+            Optional<JsonNode> issue = Optional.ofNullable(mapper.readTree(responseJson).get("items"));
+            issue.ifPresent(jsonNode -> jsonNode.forEach(entity -> {
                 GithubIssueDTO githubIssueDTO = new GithubIssueDTO();
                 githubIssueDTO.setRepoOwner(repoOwner);
                 githubIssueDTO.setRepoName(repoName);
+
                 githubIssueDTO.setCreatedAt(entity.get("created_at"));
                 githubIssueDTO.setClosedAt(entity.get("closed_at"));
                 githubIssueDTO.setAuthor(entity.get("user").get("login").textValue());
