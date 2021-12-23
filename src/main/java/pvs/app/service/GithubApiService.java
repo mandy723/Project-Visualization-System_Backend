@@ -143,7 +143,7 @@ public class GithubApiService {
                     githubCommitLoaderThread.start();
                 }
                 if(totalCount % 100 != 0) {
-                    last = totalCount % 100 - 1;
+                    last = (totalCount - 1) % 100;
 
                     GithubCommitLoaderThread githubCommitLoaderThread =
                             new GithubCommitLoaderThread(
@@ -279,8 +279,9 @@ public class GithubApiService {
 
     public boolean getCommentFromGithub(String owner, String name, Date lastUpdate) throws InterruptedException, IOException {
         try {
+            String since = dateToISO8601(lastUpdate);
             String responseJson = Objects.requireNonNull(this.webClientRestAPI.get()
-                            .uri("/" + owner + "/" + name + "/issues/comments?since:" + lastUpdate)
+                            .uri("/" + owner + "/" + name + "/issues/comments?since=" + since)
                             .exchange()
                             .block())
                     .bodyToMono(String.class)
@@ -289,13 +290,16 @@ public class GithubApiService {
 
             Optional<JsonNode> commentList = Optional.ofNullable(mapper.readTree(responseJson));
             commentList.ifPresent(jsonNode -> jsonNode.forEach(entity -> {
-                GithubCommentDTO githubCommentDTO = new GithubCommentDTO();
-                githubCommentDTO.setRepoOwner(owner);
-                githubCommentDTO.setRepoName(name);
-                githubCommentDTO.setCreatedAt(entity.get("created_at"));
-                githubCommentDTO.setAuthor(entity.get("user").get("login").textValue());
+                String tmp = entity.get("created_at").textValue();
+                if(!tmp.equals(since)) {
+                    GithubCommentDTO githubCommentDTO = new GithubCommentDTO();
+                    githubCommentDTO.setRepoOwner(owner);
+                    githubCommentDTO.setRepoName(name);
+                    githubCommentDTO.setCreatedAt(entity.get("created_at"));
+                    githubCommentDTO.setAuthor(entity.get("user").get("login").textValue());
 
-                githubCommentService.save(githubCommentDTO);
+                    githubCommentService.save(githubCommentDTO);
+                }
             }));
         } catch (Exception e) {
             return false;
