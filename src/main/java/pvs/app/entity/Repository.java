@@ -20,12 +20,22 @@ public class Repository {
     @NotNull
     private String type;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "repository")
+    @OneToMany
+    @JoinColumn(name = "repository_id")
     private Set<GithubCommit> githubCommitSet;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "repository")
+    @OneToMany
+    @JoinColumn(name = "repository_id")
     private Set<GithubComment> githubCommentsSet;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "repositorySet")
     private Set<Project> projectSet;
+
+    public Set<GithubCommit> getGithubCommitSet() {
+        return githubCommitSet;
+    }
+
+    public Set<GithubComment> getGithubCommentSet() {
+        return githubCommentsSet;
+    }
 }

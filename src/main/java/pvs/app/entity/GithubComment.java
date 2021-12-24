@@ -26,9 +26,9 @@ public class GithubComment {
     @NotNull
     private Date createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="repository_id")
-    private Repository repository;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name="repository_id")
+//    private Repository repository;
 
 //    @Override
 //    public boolean equals(Object o) {

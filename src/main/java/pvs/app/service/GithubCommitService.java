@@ -2,7 +2,10 @@ package pvs.app.service;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import pvs.app.dao.RepositoryDAO;
 import pvs.app.entity.GithubCommit;
+import pvs.app.entity.Repository;
 import pvs.app.dto.GithubCommitDTO;
 import pvs.app.dao.GithubCommitDAO;
 import java.util.LinkedList;
@@ -12,16 +15,23 @@ import java.util.List;
 public class GithubCommitService {
 
     private final GithubCommitDAO githubCommitDAO;
+    private final RepositoryDAO repositoryDAO;
     private final ModelMapper modelMapper;
 
-    GithubCommitService(GithubCommitDAO githubCommitDAO, ModelMapper modelMapper) {
+    GithubCommitService(GithubCommitDAO githubCommitDAO,RepositoryDAO repositoryDAO, ModelMapper modelMapper) {
         this.githubCommitDAO = githubCommitDAO;
+        this.repositoryDAO = repositoryDAO;
         this.modelMapper = modelMapper;
     }
 
+    @Transactional
     public void save(GithubCommitDTO githubCommitDTO) {
         GithubCommit githubCommit = modelMapper.map(githubCommitDTO, GithubCommit.class);
+        String repoUrl = "https://github.com/" + githubCommitDTO.getRepoOwner() + "/" + githubCommitDTO.getRepoName();
+        Repository repository = repositoryDAO.findByUrl(repoUrl);
+        repository.getGithubCommitSet().add(githubCommit);
         githubCommitDAO.save(githubCommit);
+        repositoryDAO.save(repository);
     }
 
     public List<GithubCommitDTO> getAllCommits(String repoOwner, String repoName) {
