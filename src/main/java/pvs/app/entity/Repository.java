@@ -1,7 +1,6 @@
 package pvs.app.entity;
 
 import lombok.Data;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
@@ -21,16 +20,22 @@ public class Repository {
     @NotNull
     private String type;
 
-    @OneToMany(mappedBy = "repository", cascade = CascadeType.PERSIST)
-//    @JoinColumn(name = "repository_id")
-    private Set<GithubCommit> githubCommitSet;
+    // 新版的 hibernate @JoinColumn 與 mappedBy 互斥，所以對應的 entity 不可以放 @ManyToOne，參考下方網址
+    // https://www.twblogs.net/a/5b9847512b717736c6238e56
+    @OneToMany(cascade = { CascadeType.ALL })
+    @JoinColumn(name = "repository_id")
+    private Set<GithubCommit> githubCommitSet = new HashSet<>();
 
-    @OneToMany(mappedBy = "repository", cascade = CascadeType.PERSIST)
-//    @JoinColumn(name = "repository_id")
-    private Set<GithubComment> githubCommentsSet;
+    @OneToMany(cascade = { CascadeType.ALL })
+    @JoinColumn(name = "repository_id")
+    private Set<GithubComment> githubCommentsSet = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "repositorySet")
     private Set<Project> projectSet;
+
+    public void removeProject(Project project) {
+        projectSet.remove(project);
+    }
 
     public Set<GithubCommit> getGithubCommitSet() {
         return githubCommitSet;

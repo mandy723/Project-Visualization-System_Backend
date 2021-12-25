@@ -4,7 +4,6 @@ import lombok.Data;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.Objects;
 
 @Entity
 @Data
@@ -25,10 +24,6 @@ public class GithubComment {
 
     @NotNull
     private Date createdAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="repository_id")
-    private Repository repository;
 
 //    @Override
 //    public boolean equals(Object o) {

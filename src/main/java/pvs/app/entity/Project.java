@@ -21,15 +21,9 @@ public class Project {
     @NotNull
     private String avatarURL = "https://avatars3.githubusercontent.com/u/17744001?u=038d9e068c4205d94c670d7d89fb921ec5b29782&v=4";
 
-//    @ManyToMany(fetch=FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
-//    @JoinTable(
-//            name = "project_repository",
-//            joinColumns = { @JoinColumn(name = "project_id") },
-//            inverseJoinColumns = { @JoinColumn(name = "repository_id") }
-//    )
-//    private Set<Repository> repositorySet = new HashSet<>();
-
-    @ManyToMany(fetch=FetchType.LAZY, cascade = { CascadeType.ALL })
+    // 不建議使用 CascadeType.REMOVE，說明如下網址
+    // https://thorben-janssen.com/avoid-cascadetype-delete-many-assocations/
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }, fetch=FetchType.LAZY)
     @JoinTable(
             name = "project_repository",
             joinColumns = { @JoinColumn(name = "project_id") },

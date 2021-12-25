@@ -36,10 +36,6 @@ public class GithubCommit {
     @NotNull
     private String authorEmail;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="repository_id")
-    private Repository repository;
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -53,13 +49,10 @@ public class GithubCommit {
                 committedDate.equals(that.committedDate) &&
                 authorName.equals(that.authorName) &&
                 authorEmail.equals(that.authorEmail);
-//                repository.equals(that.repository);
     }
 
     @Override
     public int hashCode() {
-//        return Objects.hash(id, repoOwner, repoName, committedDate, additions, deletions, authorName, authorEmail, repository);
         return Objects.hash(id, repoOwner, repoName, committedDate, additions, deletions, authorName, authorEmail);
-
     }
 }

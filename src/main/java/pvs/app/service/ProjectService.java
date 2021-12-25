@@ -9,10 +9,7 @@ import pvs.app.dto.*;
 import pvs.app.entity.Project;
 import pvs.app.entity.Repository;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ProjectService {
@@ -83,6 +80,7 @@ public class ProjectService {
         }
     }
 
+    @Transactional
     public boolean addGithubRepo(AddGithubRepositoryDTO addGithubRepositoryDTO) throws IOException {
         Optional<Project> projectOptional = projectDAO.findById(addGithubRepositoryDTO.getProjectId());
         if(projectOptional.isPresent()) {
@@ -94,6 +92,7 @@ public class ProjectService {
                 repository = new Repository();
                 repository.setUrl(url);
                 repository.setType("github");
+                repositoryDAO.save(repository);
             }
             project.getRepositorySet().add(repository);
 
@@ -112,17 +111,17 @@ public class ProjectService {
 
     @Transactional
     public void deleteProject(Long projectId) throws IOException {
-//        Optional<Project> project = projectDAO.findById(projectId);
-//        Set<Repository> repos = project.get().getRepositorySet();
+        Project project = projectDAO.findById(projectId).get();
+        for (Repository repo : project.getRepositorySet()) {
+            if (repo.getProjectSet().size() == 1) {
+                repositoryDAO.deleteById(repo.getRepositoryId());
+            }
+            else {
+                repo.removeProject(project);
+                repositoryDAO.save(repo);
+            }
+        }
+        // owner 方會自動清除 repository 關聯，及清空 repositorySet，但不會刪掉該筆 repository，因為沒有設定 CascadeType.REMOVE
         projectDAO.deleteById(projectId);
-
-//        for (Repository repo: repos) {
-//            Optional<Repository> repoTmp = repositoryDAO.findById(repo.getRepositoryId());
-//            Set<Project> projects = repoTmp.get().getProjectSet();
-//            if (projects.isEmpty()) {
-//                Long id = repo.getRepositoryId();
-//                repositoryDAO.deleteById(id);
-//            }
-//        }
     }
 }
