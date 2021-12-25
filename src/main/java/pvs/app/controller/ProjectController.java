@@ -142,4 +142,16 @@ public class ProjectController {
         //         3        //
         //////////\\\\\\\\\\\\
     }
+
+    @DeleteMapping("/project/{projectId}")
+    public ResponseEntity<String> deleteProject(@PathVariable Long projectId) {
+        try {
+            projectService.deleteProject(projectId);
+            return ResponseEntity.status(HttpStatus.OK).body(successMessage);
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.debug(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionMessage);
+        }
+    }
 }

@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -20,12 +21,12 @@ public class Repository {
     @NotNull
     private String type;
 
-    @OneToMany
-    @JoinColumn(name = "repository_id")
+    @OneToMany(mappedBy = "repository", cascade = CascadeType.PERSIST)
+//    @JoinColumn(name = "repository_id")
     private Set<GithubCommit> githubCommitSet;
 
-    @OneToMany
-    @JoinColumn(name = "repository_id")
+    @OneToMany(mappedBy = "repository", cascade = CascadeType.PERSIST)
+//    @JoinColumn(name = "repository_id")
     private Set<GithubComment> githubCommentsSet;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "repositorySet")

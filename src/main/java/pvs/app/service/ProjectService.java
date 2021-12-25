@@ -2,6 +2,7 @@ package pvs.app.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pvs.app.dao.ProjectDAO;
 import pvs.app.dao.RepositoryDAO;
 import pvs.app.dto.*;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class ProjectService {
@@ -106,5 +108,21 @@ public class ProjectService {
         } else {
             return false;
         }
+    }
+
+    @Transactional
+    public void deleteProject(Long projectId) throws IOException {
+//        Optional<Project> project = projectDAO.findById(projectId);
+//        Set<Repository> repos = project.get().getRepositorySet();
+        projectDAO.deleteById(projectId);
+
+//        for (Repository repo: repos) {
+//            Optional<Repository> repoTmp = repositoryDAO.findById(repo.getRepositoryId());
+//            Set<Project> projects = repoTmp.get().getProjectSet();
+//            if (projects.isEmpty()) {
+//                Long id = repo.getRepositoryId();
+//                repositoryDAO.deleteById(id);
+//            }
+//        }
     }
 }

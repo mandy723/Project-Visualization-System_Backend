@@ -29,8 +29,8 @@ public class GithubCommitService {
         GithubCommit githubCommit = modelMapper.map(githubCommitDTO, GithubCommit.class);
         String repoUrl = "https://github.com/" + githubCommitDTO.getRepoOwner() + "/" + githubCommitDTO.getRepoName();
         Repository repository = repositoryDAO.findByUrl(repoUrl);
-        repository.getGithubCommitSet().add(githubCommit);
         githubCommitDAO.save(githubCommit);
+        repository.getGithubCommitSet().add(githubCommit);
         repositoryDAO.save(repository);
     }
 

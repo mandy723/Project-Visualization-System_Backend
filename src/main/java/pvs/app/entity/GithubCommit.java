@@ -36,9 +36,9 @@ public class GithubCommit {
     @NotNull
     private String authorEmail;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name="repository_id")
-//    private Repository repository;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="repository_id")
+    private Repository repository;
 
     @Override
     public boolean equals(Object o) {
