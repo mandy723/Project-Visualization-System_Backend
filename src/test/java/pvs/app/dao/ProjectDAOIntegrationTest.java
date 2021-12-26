@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 import pvs.app.Application;
 import pvs.app.entity.Project;
 import pvs.app.entity.Repository;
@@ -62,6 +63,7 @@ public class ProjectDAOIntegrationTest {
     }
 
     @Test
+    @Transactional
     public void whenFindAll_thenReturnProjectList() {
         List<Project> foundEntityList = projectDAO.findAll();
         assertEquals(2, foundEntityList.size());

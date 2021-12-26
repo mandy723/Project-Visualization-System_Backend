@@ -8,9 +8,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import pvs.app.Application;
+import pvs.app.dao.RepositoryDAO;
 import pvs.app.entity.GithubCommit;
 import pvs.app.dto.GithubCommitDTO;
 import pvs.app.dao.GithubCommitDAO;
+import pvs.app.entity.Repository;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,13 +34,18 @@ public class GithubCommitServiceTest {
     @MockBean
     private GithubCommitDAO mockGithubCommitDAO;
 
+    @MockBean
+    private RepositoryDAO mockRepositoryDAO;
+
     private List<GithubCommit> githubCommits;
     private final GithubCommit githubCommit01 = new GithubCommit();
     private final GithubCommit githubCommit02 = new GithubCommit();
     private final GithubCommitDTO githubCommitDTO01 = new GithubCommitDTO();
+    private final Repository repository = new Repository();
 
     @Before
     public void setup() throws ParseException {
+        repository.setUrl("https://github.com/facebook/react");
         githubCommits = new LinkedList<>();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // 日期格式
@@ -111,6 +118,10 @@ public class GithubCommitServiceTest {
         fakeGithubCommits.add(githubCommit01);
 
         //context
+        when(mockRepositoryDAO.save(repository))
+                .thenReturn(repository);
+        when(mockRepositoryDAO.findByUrl("https://github.com/facebook/react"))
+                .thenReturn(repository);
         when(mockGithubCommitDAO.save(githubCommit01))
                 .thenReturn(githubCommit01);
         when(mockGithubCommitDAO.findByRepoOwnerAndRepoName("facebook", "react"))

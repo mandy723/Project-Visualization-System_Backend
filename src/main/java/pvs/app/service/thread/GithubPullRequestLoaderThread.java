@@ -11,17 +11,15 @@ import java.util.Optional;
 
 public class GithubPullRequestLoaderThread extends Thread {
     private static final Object lock = new Object();
+    private final WebClient webClient;
     private final List<GithubPullRequestDTO> githubPullRequestDTOList;
     private final String repoOwner;
     private final String repoName;
-    private final WebClient webClient;
     private final int page;
 
-    public GithubPullRequestLoaderThread(List<GithubPullRequestDTO> githubPullRequestDTOList, String repoOwner, String repoName, int page) {
+    public GithubPullRequestLoaderThread(WebClient webClient, List<GithubPullRequestDTO> githubPullRequestDTOList, String repoOwner, String repoName, int page) {
         String token = System.getenv("PVS_GITHUB_TOKEN");
-        this.webClient = WebClient.builder().baseUrl("https://api.github.com/repos")
-                .defaultHeader("Authorization", "Bearer " + token)
-                .build();
+        this.webClient = webClient;
         this.githubPullRequestDTOList = githubPullRequestDTOList;
         this.repoOwner = repoOwner;
         this.repoName = repoName;

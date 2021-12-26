@@ -38,7 +38,7 @@ public class GithubApiServiceTest {
     @Before
     public void setup() {
         this.mockWebServer = new MockWebServer();
-        this.githubApiService = new GithubApiService(WebClient.builder(), mockWebServer.url("/").toString(), githubCommitService, githubCommentService);
+        this.githubApiService = new GithubApiService(WebClient.builder(), mockWebServer.url("/").toString(), mockWebServer.url("/").toString(), githubCommitService, githubCommentService);
     }
 
     @Test
@@ -229,46 +229,112 @@ public class GithubApiServiceTest {
         Assert.assertEquals(0, result.size());
     }
 
+    @Test
+    public void getPullRequestFromGithub_runThread() throws ParseException {
+        //given
+        List<GithubPullRequestDTO> result = new ArrayList<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date lastDate = dateFormat.parse("2020-11-20 19:38:25");
+
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("{" +
+                            "\"data\": {" +
+                                "\"repository\": {" +
+                                    "\"pullRequests\": {" +
+                                        "\"totalCount\": 1" +
+                                    "}" +
+                                "}" +
+                            "}" +
+                        "}")
+                .addHeader("Content-Type", "application/json")
+        );
+
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("[{" +
+                            "\"state\": \"open\"," +
+                            "\"user\": {" +
+                                "\"login\": \"jonatan-ivanov\"" +
+                            "}," +
+                            "\"created_at\": \"2021-12-05T01:52:10Z\"," +
+                            "\"merged_at\": \"2021-12-10T01:52:10Z\"" +
+                        "}]")
+                .addHeader("Content-Type", "application/json")
+        );
+//        mockWebServer.enqueue(new MockResponse().setBody());
+
+        //when
+        try {
+            result = githubApiService.getPullRequestFromGithub("facebook", "react");
+        } catch (IOException | InterruptedException e) {
+
+        }
+        Assert.assertEquals(1, result.size());
+    }
+
 //    @Test
-//    public void getPullRequestFromGithub_runThread() throws ParseException {
+//    public void getCommentsFromGithub() throws ParseException {
 //        //given
-//        List<GithubPullRequestDTO> result = new ArrayList<>();
+//        boolean result = false;
 //        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //        Date lastDate = dateFormat.parse("2020-11-20 19:38:25");
 //
 //        mockWebServer.enqueue(new MockResponse()
 //                .setResponseCode(200)
 //                .setBody("{" +
-//                            "\"data\": {" +
-//                                "\"repository\": {" +
-//                                    "\"pullRequests\": {" +
-//                                        "\"totalCount\": 1" +
-//                                    "}" +
-//                                "}" +
-//                            "}" +
+//                        "    \"data\": {" +
+//                        "        \"repository\": {" +
+//                        "            \"defaultBranchRef\": {" +
+//                        "                \"target\": {" +
+//                        "                    \"history\": {" +
+//                        "                        \"totalCount\": 1," +
+//                        "                        \"pageInfo\": {" +
+//                        "                            \"startCursor\": \"50393dc3a0c59cfefd349d31992256efd6f8c261 0\"" +
+//                        "                        }" +
+//                        "                    }" +
+//                        "                }" +
+//                        "            }" +
+//                        "        }" +
+//                        "    }" +
 //                        "}")
 //                .addHeader("Content-Type", "application/json")
 //        );
 //
 //        mockWebServer.enqueue(new MockResponse()
 //                .setResponseCode(200)
-//                .setBody("{" +
-//                            "\"state\": \"open\"," +
-//                            "\"user\": {" +
-//                                "\"login\": \"jonatan-ivanov\"" +
-//                            "}," +
-//                            "\"created_at\": \"2021-12-05T01:52:10Z\"," +
-//                        "}")
-//                .addHeader("Content-Type", "application/json")
-//        );
+//                .setBody("{\n" +
+//                        "    \"data\": {\n" +
+//                        "        \"repository\": {\n" +
+//                        "            \"defaultBranchRef\": {\n" +
+//                        "                \"target\": {\n" +
+//                        "                    \"history\": {\n" +
+//                        "                        \"nodes\": [\n" +
+//                        "                            {\n" +
+//                        "                                \"committedDate\": \"2014-10-31T19:39:38Z\",\n" +
+//                        "                                \"additions\": 0,\n" +
+//                        "                                \"deletions\": 1,\n" +
+//                        "                                \"changedFiles\": 1,\n" +
+//                        "                                \"author\": {\n" +
+//                        "                                    \"email\": \"sebastian@calyptus.eu\",\n" +
+//                        "                                    \"name\": \"Sebastian Markbåge\"\n" +
+//                        "                                }\n" +
+//                        "                            }\n" +
+//                        "                        ]\n" +
+//                        "                    }\n" +
+//                        "                }\n" +
+//                        "            }\n" +
+//                        "        }\n" +
+//                        "    }\n" +
+//                        "}").addHeader("Content-Type", "application/json"));
 //
 //        //when
 //        try {
-//            result = githubApiService.getPullRequestFromGithub("facebook", "react");
+//            result = githubApiService.getCommitsFromGithub("facebook", "react", lastDate);
 //        } catch (IOException | InterruptedException e) {
 //
 //        }
-//        Assert.assertEquals(1, result.size());
+//        Assert.assertTrue(result);
 //    }
 
 }

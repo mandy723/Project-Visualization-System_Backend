@@ -13,7 +13,8 @@ message:
 webClient:
   baseUrl:
     sonar: "http://localhost:9000/api"
-    github: "https://api.github.com/graphql"
+    githubGraphQl: "https://api.github.com/graphql"
+    githubRestApi: "https://api.github.com/repos"
     test: ""
 #
 #logging:

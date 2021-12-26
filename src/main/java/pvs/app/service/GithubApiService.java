@@ -26,14 +26,14 @@ public class GithubApiService {
     private final GithubCommitService githubCommitService;
     private final  GithubCommentService githubCommentService;
 
-    public GithubApiService(WebClient.Builder webClientBuilder, @Value("${webClient.baseUrl.github}") String baseUrl, GithubCommitService githubCommitService, GithubCommentService githubCommentService) {
+    public GithubApiService(WebClient.Builder webClientBuilder, @Value("${webClient.baseUrl.githubGraphQl}") String baseGraphQlUrl, @Value("${webClient.baseUrl.githubRestApi}") String baseRestApiUrl, GithubCommitService githubCommitService, GithubCommentService githubCommentService) {
         String token = System.getenv("PVS_GITHUB_TOKEN");
         this.githubCommitService = githubCommitService;
         this.githubCommentService = githubCommentService;
-        this.webClientGraphQl = webClientBuilder.baseUrl(baseUrl)
+        this.webClientGraphQl = webClientBuilder.baseUrl(baseGraphQlUrl)
                 .defaultHeader("Authorization", "Bearer " + token)
                 .build();
-        this.webClientRestAPI = WebClient.builder().baseUrl("https://api.github.com/repos")
+        this.webClientRestAPI = webClientBuilder.baseUrl(baseRestApiUrl)
                 .defaultHeader("Authorization", "Bearer " + token)
                 .build();
     }
@@ -238,6 +238,7 @@ public class GithubApiService {
                 for (int i = 1; i <= Math.ceil(totalCount/100); i++) {
                     GithubPullRequestLoaderThread githubPullRequestLoaderThread =
                             new GithubPullRequestLoaderThread(
+                                    this.webClientRestAPI,
                                     githubPullRequestDTOList,
                                     owner,
                                     name,
