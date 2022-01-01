@@ -1,7 +1,5 @@
 package pvs.app.service;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -12,15 +10,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Service
 @SuppressWarnings("squid:S1192")
 public class RepositoryService {
-    private final WebClient webClient;
+    private final WebClient githubWebClient;
+    private final WebClient sonarWebClient;
 
-    private final String token = System.getenv("PVS_GITHUB_TOKEN");
+    private final String githubToken = System.getenv("PVS_GITHUB_TOKEN");
+    private final String sonarToken = System.getenv("PVS_SONAR_TOKEN");
 
-    static final Logger logger = LogManager.getLogger(RepositoryService.class.getName());
-
-    public RepositoryService(WebClient.Builder webClientBuilder, @Value("${webClient.baseUrl.test}") String baseUrl) {
-        this.webClient = webClientBuilder.baseUrl(baseUrl)
-                .defaultHeader("Authorization", "Bearer " + token )
+    public RepositoryService( @Value("${webClient.baseUrl.test}") String baseUrl) {
+        this.sonarWebClient = WebClient.builder().baseUrl(baseUrl)
+                .defaultHeader("Authorization", "Bearer " + sonarToken )
+                .build();
+        this.githubWebClient = WebClient.builder().baseUrl(baseUrl)
+                .defaultHeader("Authorization", "Bearer " + githubToken )
                 .build();
     }
 
@@ -31,7 +32,7 @@ public class RepositoryService {
         String targetURL = url.replace("github.com", "api.github.com/repos");
         AtomicBoolean result = new AtomicBoolean(false);
 
-        this.webClient
+        this.githubWebClient
                 .get()
                 .uri(targetURL)
                 .exchange()
@@ -46,11 +47,12 @@ public class RepositoryService {
         if(!url.contains("localhost")){
             return false;
         }
-
+//        http://localhost:9000/api/components/show?component=SEWinWinWin_PVS_backend
+//        http://localhost:9000/dashboard?id=SEWinWinWin_PVS_backend
         String targetURL = url.replace("dashboard?id", "api/components/show?component");
         AtomicBoolean result = new AtomicBoolean(false);
 
-        this.webClient
+        this.sonarWebClient
                 .get()
                 .uri(targetURL)
                 .exchange()

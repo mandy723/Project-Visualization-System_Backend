@@ -73,6 +73,7 @@ public class ProjectService {
             repository.setUrl(addSonarRepositoryDTO.getRepositoryURL());
             repository.setType("sonar");
             project.getRepositorySet().add(repository);
+            repositoryDAO.save(repository);
             projectDAO.save(project);
             return true;
         } else {

@@ -58,8 +58,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
-                .and().csrf().disable()
+        CorsConfiguration corsConfig = new CorsConfiguration().applyPermitDefaultValues();
+        corsConfig.addAllowedMethod(HttpMethod.DELETE.name());
+        http.cors().configurationSource(request -> corsConfig).and().csrf().disable()
                 //因為使用JWT，所以不需要HttpSession
                 .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
