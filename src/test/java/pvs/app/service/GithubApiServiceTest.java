@@ -273,68 +273,31 @@ public class GithubApiServiceTest {
         Assert.assertEquals(1, result.size());
     }
 
-//    @Test
-//    public void getCommentsFromGithub() throws ParseException {
-//        //given
-//        boolean result = false;
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        Date lastDate = dateFormat.parse("2020-11-20 19:38:25");
-//
-//        mockWebServer.enqueue(new MockResponse()
-//                .setResponseCode(200)
-//                .setBody("{" +
-//                        "    \"data\": {" +
-//                        "        \"repository\": {" +
-//                        "            \"defaultBranchRef\": {" +
-//                        "                \"target\": {" +
-//                        "                    \"history\": {" +
-//                        "                        \"totalCount\": 1," +
-//                        "                        \"pageInfo\": {" +
-//                        "                            \"startCursor\": \"50393dc3a0c59cfefd349d31992256efd6f8c261 0\"" +
-//                        "                        }" +
-//                        "                    }" +
-//                        "                }" +
-//                        "            }" +
-//                        "        }" +
-//                        "    }" +
-//                        "}")
-//                .addHeader("Content-Type", "application/json")
-//        );
-//
-//        mockWebServer.enqueue(new MockResponse()
-//                .setResponseCode(200)
-//                .setBody("{\n" +
-//                        "    \"data\": {\n" +
-//                        "        \"repository\": {\n" +
-//                        "            \"defaultBranchRef\": {\n" +
-//                        "                \"target\": {\n" +
-//                        "                    \"history\": {\n" +
-//                        "                        \"nodes\": [\n" +
-//                        "                            {\n" +
-//                        "                                \"committedDate\": \"2014-10-31T19:39:38Z\",\n" +
-//                        "                                \"additions\": 0,\n" +
-//                        "                                \"deletions\": 1,\n" +
-//                        "                                \"changedFiles\": 1,\n" +
-//                        "                                \"author\": {\n" +
-//                        "                                    \"email\": \"sebastian@calyptus.eu\",\n" +
-//                        "                                    \"name\": \"Sebastian Markbåge\"\n" +
-//                        "                                }\n" +
-//                        "                            }\n" +
-//                        "                        ]\n" +
-//                        "                    }\n" +
-//                        "                }\n" +
-//                        "            }\n" +
-//                        "        }\n" +
-//                        "    }\n" +
-//                        "}").addHeader("Content-Type", "application/json"));
-//
-//        //when
-//        try {
-//            result = githubApiService.getCommitsFromGithub("facebook", "react", lastDate);
-//        } catch (IOException | InterruptedException e) {
-//
-//        }
-//        Assert.assertTrue(result);
-//    }
+    @Test
+    public void getCommentsFromGithub() throws ParseException {
+        //given
+        boolean result = false;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date lastDate = dateFormat.parse("2020-11-20 19:38:25");
+
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("[{" +
+                        "\"created_at\": \"2021-12-05T01:52:10Z\"," +
+                            "\"user\": {" +
+                                "\"login\": \"jonatan-ivanov\"" +
+                        "}" +
+                        "}]")
+                .addHeader("Content-Type", "application/json")
+        );
+
+        //when
+        try {
+            result = githubApiService.getCommentFromGithub("facebook", "react", lastDate);
+        } catch (IOException | InterruptedException e) {
+
+        }
+        Assert.assertTrue(result);
+    }
 
 }

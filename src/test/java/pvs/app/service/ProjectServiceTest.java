@@ -73,8 +73,8 @@ public class ProjectServiceTest {
     @Test
     public void create() throws IOException {
         //context
-        when(githubApiService.getAvatarURL("facebook"))
-                .thenReturn(mockAvatar.orElse(null));
+//        when(githubApiService.getAvatarURL("facebook"))
+//                .thenReturn(mockAvatar.orElse(null));
 
         when(projectDAO.save(any(Project.class)))
                 .thenReturn(project);
