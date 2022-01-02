@@ -30,7 +30,7 @@ public class SonarApiService {
     public SonarApiService(WebClient.Builder webClientBuilder, @Value("${webClient.baseUrl.sonar}") String baseUrl) {
         String token = System.getenv("PVS_SONAR_TOKEN");
         this.webClient = webClientBuilder.baseUrl(baseUrl)
-                .defaultHeader("Authorization", "Bearer " + token)
+                .defaultHeaders(header -> header.setBasicAuth(token, ""))
                 .build();
         isoParser = ISODateTimeFormat.dateTimeNoMillis().withLocale(Locale.TAIWAN);
     }

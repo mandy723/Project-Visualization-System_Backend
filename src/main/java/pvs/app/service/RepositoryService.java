@@ -18,7 +18,7 @@ public class RepositoryService {
 
     public RepositoryService( @Value("${webClient.baseUrl.test}") String baseUrl) {
         this.sonarWebClient = WebClient.builder().baseUrl(baseUrl)
-                .defaultHeader("Authorization", "Bearer " + sonarToken )
+                .defaultHeaders(header -> header.setBasicAuth(sonarToken, ""))
                 .build();
         this.githubWebClient = WebClient.builder().baseUrl(baseUrl)
                 .defaultHeader("Authorization", "Bearer " + githubToken )
