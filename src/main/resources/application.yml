@@ -47,7 +47,7 @@ spring:
     active: test
   datasource:
     #    url: jdbc:postgresql://localhost:5432/PVS
-    url: jdbc:mysql://127.0.0.1:3306/pvs?useSSL=false&createDatabaseIfNotExist=true
+    url: jdbc:mysql://${DB_CONNECT_IP:127.0.0.1}:3306/pvs?useSSL=false&createDatabaseIfNotExist=true
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
