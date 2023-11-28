@@ -1,6 +1,6 @@
-# PVS-springboot
+# PVS_Backend
 
-### Reference
+Visualized the activity of GitHub repositories and SonarQube code quality inspection data to provide users with a unified platform to track the project's status.
 
 ### Run App Step
 1. set java home:  https://javatutorial.net/set-java-home-windows-10
